@@ -15,6 +15,7 @@
     </div>
     <div id="container" style="flex-grow: 1; height: 600px; border: 1px solid #ccc;"></div>
   </div>
+  <div><button @click="saveGraph"></button></div>
 </template>
 
 <script>
@@ -25,6 +26,9 @@ export default {
   data() {
     return {
       graph: null,
+      nodes: [],
+      edges: [],
+      selectedNodeId: null,
     };
   },
   mounted() {
@@ -50,7 +54,7 @@ export default {
           },
         },
         defaultEdge: {
-          type: 'polyline',
+          type: 'quadratic',
           style: {
             stroke: '#e2e2e2',
             lineWidth: 2,
@@ -59,33 +63,17 @@ export default {
               d: 10,
             },
           },
+          labelCfg: {
+            autoRotate: true,
+          },
         },
       });
 
-      let selectedNodeId = null;
+      // Event listeners
+      this.graph.on('node:click', this.onNodeClick);
 
-      this.graph.on('node:dblclick', (evt) => {
-        const { item } = evt;
-        selectedNodeId = item.getID();
-      });
-
-      this.graph.on('node:click', (evt) => {
-        const { item } = evt;
-        const clickedNodeId = item.getID();
-        if (selectedNodeId && selectedNodeId !== clickedNodeId) {
-          this.graph.addItem('edge', {
-            source: selectedNodeId,
-            target: clickedNodeId,
-            style: {
-              endArrow: {
-                path: G6.Arrow.vee(10, 10, 10),
-                d: 10,
-              },
-            },
-          });
-          selectedNodeId = null;
-        }
-      });
+      // Initial render
+      this.updateGraph();
     },
     onDragStart(event, nodeType) {
       event.dataTransfer.setData('node-type', nodeType);
@@ -101,15 +89,54 @@ export default {
         const nodeType = event.dataTransfer.getData('node-type');
         if (nodeType) {
           const model = {
-            id: `${nodeType}-${Date.now()}`,
+            id: `${nodeType}-${this.nodes.length}`,
             x: event.offsetX,
             y: event.offsetY,
+            label: `${nodeType.toUpperCase()} - ${this.nodes.length}`,
             type: nodeType,
           };
-          this.graph.addItem('node', model);
+          this.nodes.push(model); // Add node to nodes array
+          this.updateGraph(); // Re-render the graph
         }
       });
     },
+    onNodeClick(evt) {
+      const { item } = evt;
+      const clickedNodeId = item.getID();
+      if (this.selectedNodeId && this.selectedNodeId !== clickedNodeId) {
+        const newEdge = {
+          source: this.selectedNodeId,
+          target: clickedNodeId,
+          label: `edge from ${this.selectedNodeId} to ${clickedNodeId}`,
+          style: {
+            endArrow: {
+              path: G6.Arrow.vee(10, 10, 10),
+              d: 10,
+            },
+          },
+        };
+        this.edges.push(newEdge); // Add edge to edges array
+        this.updateGraph(); // Re-render the graph
+        this.selectedNodeId = null; // Reset selected node
+      } else {
+        this.selectedNodeId = clickedNodeId; // Set this node as selected
+      }
+    },
+    updateGraph() {
+      // Use nodes and edges data to update the graph
+      this.graph.data({
+        nodes: this.nodes,
+        edges: this.edges,
+      });
+      
+      G6.Util.processParallelEdges(this.edges);
+      this.graph.render();
+    },
+    saveGraph() {
+      const data = this.graph.save();
+      const dataStr = JSON.stringify(data, null, 2); 
+      console.log(dataStr)
+    }
   },
 };
 </script>
