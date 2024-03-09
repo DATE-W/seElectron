@@ -134,6 +134,7 @@ let nodes = ref([])
 let edges = ref([])
 let selectedNodeId = ref(null)
 let sourceAnchorIdx, targetAnchorIdx
+let rendered = false;
 
 import classesData from '@/static/classes.json'
 
@@ -180,7 +181,7 @@ function register(inNum, outNum) {
                   stroke: '#5F95FF'
               },
               // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-              name: `anchor-point`, // the name, for searching by group.find(ele => ele.get('name') === 'anchor-point')
+              name: `anchor-point + ${i}`, // the name, for searching by group.find(ele => ele.get('name') === 'anchor-point')
               anchorPointIdx: i, // flag the idx of the anchor-point circle
               links: 1, // cache the number of edges connected to this shape
               visible: false, // invisible by default, shows up when links > 1 or the node is in showAnchors state
@@ -191,7 +192,7 @@ function register(inNum, outNum) {
     // response the state changes and show/hide the link-point circles
     setState(name, value, item) {
       if (name === 'showAnchors') {
-          const anchorPoints = item.getContainer().findAll(ele => ele.get('name') === 'anchor-point');
+          const anchorPoints = item.getContainer().findAll(ele => ele.get('name').includes('anchor-point'));
           anchorPoints.forEach(point => {
               if (value || point.get('links') > 0) point.show()
               else point.hide()
@@ -214,7 +215,7 @@ function initGraph() {
       {
           type: 'drag-node',
           shouldBegin: e => {
-              if (e.target.get('name') === 'anchor-point') return false;
+              if (e.target.get('name').includes('anchor-point')) return false;
               return true;
           }
       },
@@ -224,14 +225,14 @@ function initGraph() {
           trigger: 'drag', // set the trigger to be drag to make the create-edge triggered by drag
           shouldBegin: e => {
               // avoid beginning at other shapes on the node
-              if (e.target && e.target.get('name') !== 'anchor-point') return false;
+              if (e.target && (!e.target.get('name').includes('anchor-point'))) return false;
               sourceAnchorIdx = e.target.get('anchorPointIdx');
               e.target.set('links', e.target.get('links') + 1); // cache the number of edge connected to this anchor-point circle
               return true;
           },
           shouldEnd: e => {
               // avoid ending at other shapes on the node
-              if (e.target && e.target.get('name') !== 'anchor-point') return false;
+              if (e.target && !e.target.get('name').includes('anchor-point')) return false;
               if (e.target) {
                   targetAnchorIdx = e.target.get('anchorPointIdx');
                   e.target.set('links', e.target.get('links') + 1);  // cache the number of edge connected to this anchor-point circle
@@ -290,14 +291,14 @@ function initGraph() {
       });
       
   });
-  // // after drag from the first node, the edge is created, update the sourceAnchor
-  // graph.value.on('afteradditem', e => {
-  //     if (e.item && e.item.getType() === 'edge') {
-  //         graph.value.updateItem(e.item, {
-  //             sourceAnchor: sourceAnchorIdx
-  //         });
-  //     }
-  // })
+  // after drag from the first node, the edge is created, update the sourceAnchor
+  graph.value.on('afteradditem', e => {
+      if (e.item && e.item.getType() === 'edge') {
+          graph.value.updateItem(e.item, {
+              sourceAnchor: sourceAnchorIdx
+          });
+      }
+  })
   // if create-edge is canceled before ending, update the 'links' on the anchor-point circles
   graph.value.on('afterremoveitem', e => {
     if (e.item && e.item.source && e.item.target) {
@@ -305,11 +306,11 @@ function initGraph() {
         const targetNode = graph.value.findById(e.item.target);
         const { sourceAnchor, targetAnchor } = e.item;
         if (sourceNode && !isNaN(sourceAnchor)) {
-            const sourceAnchorShape = sourceNode.getContainer().find(ele => (ele.get('name') === 'anchor-point' && ele.get('anchorPointIdx') === sourceAnchor));
+            const sourceAnchorShape = sourceNode.getContainer().find(ele => (ele.get('name').includes('anchor-point') && ele.get('anchorPointIdx') === sourceAnchor));
             sourceAnchorShape.set('links', sourceAnchorShape.get('links') - 1);
         }
         if (targetNode && !isNaN(targetAnchor)) {
-            const targetAnchorShape = targetNode.getContainer().find(ele => (ele.get('name') === 'anchor-point' && ele.get('anchorPointIdx') === targetAnchor));
+            const targetAnchorShape = targetNode.getContainer().find(ele => (ele.get('name').includes('anchor-point') && ele.get('anchorPointIdx') === targetAnchor));
             targetAnchorShape.set('links', targetAnchorShape.get('links') - 1);
         }
     }
@@ -406,7 +407,7 @@ function updateGraph() {
   // Use nodes and edges data to update the graph
   edges.value.forEach((edge, i)=>{
     console.log(i);
-    console.log(edge)
+    console.log(edge.sourceAnchor)
   })
   graph.value.data({
     nodes: nodes.value,
@@ -414,7 +415,15 @@ function updateGraph() {
   });
   console.log(edges.value)
   G6.Util.processParallelEdges(edges.value);
+  graph.value.save().edges.forEach((edge, i)=>{
+    console.log(i);
+    console.log(edge.sourceAnchor);
+  })
   graph.value.render();
+  graph.value.save().edges.forEach((edge, i)=>{
+    console.log(i);
+    console.log(edge.sourceAnchor);
+  })
 }
 
 function saveGraph() {
