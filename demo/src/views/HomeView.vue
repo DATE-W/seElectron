@@ -132,12 +132,13 @@ const processParallelEdgesOnAnchorPoint = (
 let graph = ref(null)
 let nodes = ref([])
 let edges = ref([])
-let selectedNodeId = ref(null)
+// let selectedNodeId = ref(null)
 let sourceAnchorIdx, targetAnchorIdx
 
 import classesData from '@/static/classes.json'
 
 let classes = classesData.classes
+let curVarType = ref('')
 
 onMounted(() => {
   initGraph()
@@ -159,7 +160,7 @@ function getRectAnchors(inNum, outNum) {
   return anchors
 }
 
-function register(inNum, outNum) {
+function register(inNum, outNum, inPar, outPar) {
   let newName = `rect-node-${inNum}-${outNum}`
   G6.registerNode(newName,{
     getAnchorPoints(cfg) {
@@ -171,6 +172,7 @@ function register(inNum, outNum) {
       const bbox = group.getBBox();
       const anchorPoints = this.getAnchorPoints(cfg)
       anchorPoints.forEach((anchorPos, i) => {
+          const isEntryPoint = i < inNum;
           group.addShape('circle', {
               attrs: {
                   r: 5,
@@ -184,7 +186,9 @@ function register(inNum, outNum) {
               anchorPointIdx: i, // flag the idx of the anchor-point circle
               links: 1, // cache the number of edges connected to this shape
               visible: false, // invisible by default, shows up when links > 1 or the node is in showAnchors state
-              draggable: true // allow to catch the drag events on this shape
+              draggable: true, // allow to catch the drag events on this shape
+              pointType: isEntryPoint ? 'entry' : 'exit', // 入点或出点
+              parType: isEntryPoint ? inPar[i].type : outPar[i-inNum].type
           })
       })
     },
@@ -226,17 +230,27 @@ function initGraph() {
               // avoid beginning at other shapes on the node
               if (e.target && e.target.get('name') !== 'anchor-point') return false;
               sourceAnchorIdx = e.target.get('anchorPointIdx');
+              if (e.target.get('pointType') != 'exit') return false;
+              curVarType = e.target.get('parType');
               e.target.set('links', e.target.get('links') + 1); // cache the number of edge connected to this anchor-point circle
               return true;
           },
           shouldEnd: e => {
               // avoid ending at other shapes on the node
               if (e.target && e.target.get('name') !== 'anchor-point') return false;
+              console.log(curVarType)
+              if (e.target.get('pointType') != 'entry') return false;
+              if (e.target.get('parType') != curVarType) {
+                alert(`出点的类型为: ${curVarType}，入点的类型为: ${e.target.get('parType')}，二者类型不同，不能相互连接。`);
+                curVarType = '';
+                return false;
+              }
               if (e.target) {
                   targetAnchorIdx = e.target.get('anchorPointIdx');
                   e.target.set('links', e.target.get('links') + 1);  // cache the number of edge connected to this anchor-point circle
                   return true;
               }
+
               targetAnchorIdx = undefined;
               return true;
           },
@@ -291,13 +305,13 @@ function initGraph() {
       
   });
   // // after drag from the first node, the edge is created, update the sourceAnchor
-  // graph.value.on('afteradditem', e => {
-  //     if (e.item && e.item.getType() === 'edge') {
-  //         graph.value.updateItem(e.item, {
-  //             sourceAnchor: sourceAnchorIdx
-  //         });
-  //     }
-  // })
+  graph.value.on('afteradditem', (e) => {
+       if (e.item && e.item.getType() === 'edge' && sourceAnchorIdx != null) {
+          graph.value.updateItem(e.item, {
+              sourceAnchor: sourceAnchorIdx
+          });
+      }
+  })
   // if create-edge is canceled before ending, update the 'links' on the anchor-point circles
   graph.value.on('afterremoveitem', e => {
     if (e.item && e.item.source && e.item.target) {
@@ -342,9 +356,8 @@ function initGraph() {
 function onDragStart(event, className) {
   
   let dragClass = classes.find(item => item.class_name == className);
-  event.dataTransfer.setData('text',dragClass.code);
-  event.dataTransfer.setData('in-num',dragClass.input_num)
-  event.dataTransfer.setData('out-num',dragClass.output_num)
+  event.dataTransfer.setData('className', dragClass.class_name)
+  console.log(dragClass.class_name)
 }
 
 function setupDragEvents() {
@@ -356,11 +369,15 @@ function setupDragEvents() {
   container.addEventListener('drop', (event) => {
     event.preventDefault();
     console.log("triggered drop")
-    let inNum = event.dataTransfer.getData('in-num');
-    let outNum = event.dataTransfer.getData('out-num');
-    let text = event.dataTransfer.getData('text');
+    let className = event.dataTransfer.getData('className');
+    let dragClass = classes.find(item => item.class_name == className);
+    let inNum = dragClass.input_num;
+    let outNum = dragClass.output_num;
+    let inPar = dragClass.input_params;
+    let outPar = dragClass.output_params;
+    let text = dragClass.code;
     event.dataTransfer.clearData();
-    let nodeType = register(inNum, outNum)
+    let nodeType = register(inNum, outNum, inPar, outPar);
     if (nodeType) {
       const model = {
         id: `${nodeType}-${nodes.value.length}`,
@@ -414,6 +431,7 @@ function updateGraph() {
   });
   console.log(edges.value)
   G6.Util.processParallelEdges(edges.value);
+  sourceAnchorIdx = null;
   graph.value.render();
 }
 
