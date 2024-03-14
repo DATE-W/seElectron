@@ -153,6 +153,7 @@ let nodes = ref([])
 let edges = ref([])
 // let selectedNodeId = ref(null)
 let sourceAnchorIdx, targetAnchorIdx
+const menu = ref(null)
 
 import classesData from '@/static/classes.json'
 
@@ -160,9 +161,45 @@ let classes = classesData.classes
 let curVarType = ref('')
 
 onMounted(() => {
-  initGraph()
-  setupDragEvents()
+    initMenu()
+    initGraph()
+    setupDragEvents()
 })
+
+function initMenu()
+{
+    menu.value = new G6.Menu({
+        getContent(evt) {
+        let header;
+        if (evt.target && evt.target.isCanvas && evt.target.isCanvas()) {
+          header = 'Canvas ContextMenu';
+        } else if (evt.item) {
+          const itemType = evt.item.getType();
+          header = `${itemType.toUpperCase()} ContextMenu`;
+        }
+        return `
+        <h3>${header}</h3>
+        <ul>
+          <li title='1'>li 1</li>
+          <li title='2'>li 2</li>
+          <li>li 3</li>
+          <li>li 4</li>
+          <li>li 5</li>
+        </ul>`;
+        },
+        handleMenuClick: (target, item) => {
+          console.log(target, item);
+        },
+        // offsetX and offsetY include the padding of the parent container
+        // 需要加上父级容器的 padding-left 16 与自身偏移量 10
+        offsetX: 16 + 10,
+        // 需要加上父级容器的 padding-top 24 、画布兄弟元素高度、与自身偏移量 10
+        offsetY: 0,
+        // the types of items that allow the menu show up
+        // 在哪些类型的元素上响应
+        itemTypes: ['node', 'edge', 'canvas'],
+    })
+}
 
 function hideAnchorPointsVisibility(item)
 {
@@ -222,7 +259,7 @@ function register(inNum, outNum, inPar, outPar) {
               name: `anchor-point`, // the name, for searching by group.find(ele => ele.get('name') === 'anchor-point')
               anchorPointIdx: i, // flag the idx of the anchor-point circle
               links: 1, // cache the number of edges connected to this shape
-              visible: false, // invisible by default, shows up when links > 1 or the node is in showAnchors state
+              visible: true, // invisible by default, shows up when links > 1 or the node is in showAnchors state
               draggable: true, // allow to catch the drag events on this shape
               pointType: isEntryPoint ? 'entry' : 'exit', // 入点或出点
               parType: isEntryPoint ? inPar[i].type : outPar[i-inNum].type
@@ -249,6 +286,7 @@ function initGraph() {
     container: 'container',
     width: 800,
     height: 600,
+    plugins:[menu],
     modes: {
       default: [
       // config the shouldBegin for drag-node to avoid node moving while dragging on the anchor-point circles
@@ -383,8 +421,12 @@ function initGraph() {
   })
   graph.value.on('node:mouseleave', e => {
     // graph.value.setItemState(e.item, 'showAnchors', false);
-    // mouseleave不符合预期，暂时不考虑触发隐藏锚点
+    hideAnchorPointsVisibility(e.item)
   })
+  graph.value.on('node:mouseout', e => {
+    // mouseout不符合预期，暂时不考虑触发隐藏锚点
+    // hideAnchorPointsVisibility(e.item)
+  }) 
   graph.value.on('node:dragenter', e => {
     // graph.value.setItemState(e.item, 'showAnchors', true);
     showAnchorPointsVisibility(e.item)
@@ -402,13 +444,11 @@ function initGraph() {
     // graph.value.setItemState(e.item, 'showAnchors', false);
     hideAnchorPointsVisibility(e.item)
   })
-
   // Initial render
   updateGraph();
 }
 
 function onDragStart(event, className) {
-  
   let dragClass = classes.find(item => item.class_name == className);
   event.dataTransfer.setData('className', dragClass.class_name)
   console.log(dragClass.class_name)
@@ -496,7 +536,6 @@ function saveGraph() {
   const dataStr = JSON.stringify(data, null, 2); 
   console.log(dataStr)
 }
-
 </script>
 
 
