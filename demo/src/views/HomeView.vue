@@ -164,6 +164,24 @@ onMounted(() => {
   setupDragEvents()
 })
 
+function hideAnchorPointsVisibility(item)
+{
+    console.log(item)
+    const anchorPoints = item.getContainer().findAll(ele => ele.get('name') === 'anchor-point');
+    anchorPoints.forEach(point => {
+        console.log(point)
+        point.attr({opacity:0})
+    })
+}
+
+function showAnchorPointsVisibility(item)
+{
+    const anchorPoints = item.getContainer().findAll(ele => ele.get('name') === 'anchor-point');
+    anchorPoints.forEach(point => {
+        console.log(point)
+        point.attr({opacity:1})
+    })
+}
 
 function getRectAnchors(inNum, outNum) {
   // 4,3 leads to [[0, 0.2], [0, 0.4], [0, 0.6], [0, 0.8], [1, 0.25], [1, 0.5], [1, 0.75]]
@@ -360,23 +378,29 @@ function initGraph() {
 
   // some listeners to control the state of nodes to show and hide anchor-point circles
   graph.value.on('node:mouseenter', e => {
-    graph.value.setItemState(e.item, 'showAnchors', true);
+    // graph.value.setItemState(e.item, 'showAnchors', true);
+    showAnchorPointsVisibility(e.item)
   })
   graph.value.on('node:mouseleave', e => {
-    graph.value.setItemState(e.item, 'showAnchors', false);
+    // graph.value.setItemState(e.item, 'showAnchors', false);
+    // mouseleave不符合预期，暂时不考虑触发隐藏锚点
   })
   graph.value.on('node:dragenter', e => {
-    graph.value.setItemState(e.item, 'showAnchors', true);
+    // graph.value.setItemState(e.item, 'showAnchors', true);
+    showAnchorPointsVisibility(e.item)
   })
   graph.value.on('node:dragleave', e => {
     console.log("dragleave")
-    graph.value.setItemState(e.item, 'showAnchors', false);
+    // graph.value.setItemState(e.item, 'showAnchors', false);
+    hideAnchorPointsVisibility(e.item)
   })
   graph.value.on('node:dragstart', e => {
-    graph.value.setItemState(e.item, 'showAnchors', true);
+    // graph.value.setItemState(e.item, 'showAnchors', true);
+    showAnchorPointsVisibility(e.item)
   })
   graph.value.on('node:dragout', e => {
-    graph.value.setItemState(e.item, 'showAnchors', false);
+    // graph.value.setItemState(e.item, 'showAnchors', false);
+    hideAnchorPointsVisibility(e.item)
   })
 
   // Initial render
