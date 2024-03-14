@@ -2,46 +2,46 @@
   <div style="display:flex">
     <div
       id="shape-selector"
-      style="width: 200px; height: 600px; border: 1px solid #ccc; padding: 10px;
-      display:block;flex-direction:column;justify-items:center;align-items:center"
+      style="width: 200px; height: 600px; border: 1px solid #ccc; padding: 10px; display:block; flex-direction:column; justify-items:center; align-items:center"
     >
-      <!-- <div style="display:flex;justify-items:center;align-items:center"> -->
-        <div
-          id="drag-node"
-          style="width: 120px; height: 40px; background-color: #9EC9FF; cursor: grab; margin-bottom:5px;display:flex;border-radius:10%;justify-content: center;align-items: center;"
+      <div v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
+        <h3>{{ category.categoryName }}</h3>
+        <div v-for="model in category.models" :key="model.class_name"
+          class="drag-node model"
           draggable="true"
-          @dragstart="onDragStart($event, 'A')"
-        >
-          矩形-3-2(A)
+          @dragstart="onDragStart($event, model.class_name)"
+          :style="{ backgroundColor: model.color }">
+          {{ model.description }}
         </div>
-        <div
-          id="drag-node"
-          style="width: 120px; height: 40px; background-color: #9EC9FF; cursor: grab; margin-bottom:5px;display:flex;border-radius:10%;justify-content: center;align-items: center;"
-          draggable="true"
-          @dragstart="onDragStart($event, 'B')"
-        >
-          矩形-4-3(B)
-        </div>
-        <div
-          id="drag-node"
-          style="width: 120px; height: 40px; background-color: #9EC9FF; cursor: grab; margin-bottom:5px;display:flex;border-radius:10%;justify-content: center;align-items: center;"
-          draggable="true"
-          @dragstart="onDragStart($event, 'C')"
-        >
-          矩形-1-5(C)
-        </div>
-      <!-- </div> -->
+      </div>
     </div>
     
     <div id="container" style="flex-grow: 1; height: 600px; border: 1px solid #ccc;"></div>
   </div>
   <div><button @click="saveGraph">save</button></div>
+  <div>
+    <el-dialog
+    title="Warning"
+    width="500"
+    align-center
+    v-model="detailDialogVisible">
+      <div style="display:flex; flex-direction: column;">
+        class-name:{{ selectedClassName }}
+      </div>
+    </el-dialog>
+  </div>
 </template>
 
 <script setup name="GraphEditor">
 import G6 from '@antv/g6';
 import {ref, onMounted} from 'vue'
 
+// display
+const selectedClassName = ref('')
+const selectedClassInputParams = ref([])
+const selectedClassCode = ref('')
+
+const detailDialogVisible = ref(false);
 const processParallelEdgesOnAnchorPoint = (
     edges,
     offsetDiff = 15,
@@ -128,6 +128,25 @@ const processParallelEdgesOnAnchorPoint = (
     }
     return edges;
 };
+
+// 实际接入后端后，改为在init时进行处理
+const categories = ref([
+  {
+    categoryName: "第一类",
+    models: [
+      { class_name: "A", description: "矩形-3-2(A)", color: "#9EC9FF" },
+      { class_name: "B", description: "矩形-4-3(B)", color: "#9EC9FF" },
+    ]
+  },
+  {
+    categoryName: "第二类",
+    models: [
+      { class_name: "C", description: "矩形-1-5(C)", color: "#FFD700" },
+      { class_name: "D", description: "矩形-1-3(D)", color: "#FFD700" },
+    ]
+  },
+]);
+
 
 let graph = ref(null)
 let nodes = ref([])
@@ -328,6 +347,17 @@ function initGraph() {
         }
     }
   })
+
+  // 节点双击事件
+  graph.value.on('dblclick', e => {
+    console.log(e.item)
+    if(e.item && e.item.getType() !== 'edge')
+    {
+      detailDialogVisible.value = true;
+      selectedClassName.value = e.item._cfg.model.className;
+    }
+  })
+
   // some listeners to control the state of nodes to show and hide anchor-point circles
   graph.value.on('node:mouseenter', e => {
     graph.value.setItemState(e.item, 'showAnchors', true);
@@ -378,16 +408,18 @@ function setupDragEvents() {
     let text = dragClass.code;
     event.dataTransfer.clearData();
     let nodeType = register(inNum, outNum, inPar, outPar);
+    console.log(categories.value)
     if (nodeType) {
       const model = {
         id: `${nodeType}-${nodes.value.length}`,
+        className: className,
         x: event.offsetX,
         y: event.offsetY,
         label: `${text}`,
         type: nodeType,
-        // style: {
-        //   "fill":"red"
-        // }
+        style: {
+          "fill": categories.value[dragClass.category].models[0].color
+        }
       };
       console.log(edges)
       nodes.value.push(model); // Add node to nodes array
@@ -446,4 +478,14 @@ function saveGraph() {
 
 
 <style scoped>
+.model {
+  width: 120px; 
+  height: 40px;
+  cursor: grab;
+  margin-bottom:5px;
+  display:flex;
+  border-radius:10%;
+  justify-content: center;
+  align-items: center;
+}
 </style>
