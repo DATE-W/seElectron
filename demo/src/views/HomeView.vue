@@ -253,7 +253,8 @@ function register(inNum, outNum, inPar, outPar) {
                   x: bbox.x + bbox.width * anchorPos[0],
                   y: bbox.y + bbox.height * anchorPos[1],
                   fill: '#fff',
-                  stroke: '#5F95FF'
+                  stroke: '#5F95FF',
+                  opacity: 0
               },
               // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
               name: `anchor-point`, // the name, for searching by group.find(ele => ele.get('name') === 'anchor-point')
@@ -429,7 +430,7 @@ function initGraph() {
   }) 
   graph.value.on('node:dragenter', e => {
     // graph.value.setItemState(e.item, 'showAnchors', true);
-    showAnchorPointsVisibility(e.item)
+    hideAnchorPointsVisibility(e.item)
   })
   graph.value.on('node:dragleave', e => {
     console.log("dragleave")
@@ -440,8 +441,9 @@ function initGraph() {
     // graph.value.setItemState(e.item, 'showAnchors', true);
     showAnchorPointsVisibility(e.item)
   })
-  graph.value.on('node:dragout', e => {
+  graph.value.on('node:dragend', e => {
     // graph.value.setItemState(e.item, 'showAnchors', false);
+    console.log('dragend')
     hideAnchorPointsVisibility(e.item)
   })
   // Initial render
@@ -461,8 +463,15 @@ function setupDragEvents() {
   });
 
   container.addEventListener('drop', (event) => {
+    // hideAnchorPointsVisibility(event.item)
+    // const anchorPoints = this.findAll(ele => ele.get('name') === 'anchor-point');
+    // anchorPoints.forEach(point => {
+    //     console.log(point)
+    //     point.attr({opacity:0})
+    // })
     event.preventDefault();
     console.log("triggered drop")
+    console.log(event)
     let className = event.dataTransfer.getData('className');
     let dragClass = classes.find(item => item.class_name == className);
     let inNum = dragClass.input_num;
