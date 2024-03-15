@@ -33,7 +33,7 @@
 </template>
 
 <script setup name="GraphEditor">
-import G6 from '@antv/g6';
+import G6, { Tooltip } from '@antv/g6';
 import {ref, onMounted} from 'vue'
 
 // display
@@ -160,6 +160,15 @@ import classesData from '@/static/classes.json'
 let classes = classesData.classes
 let curVarType = ref('')
 
+import insertCss from 'insert-css';
+insertCss(`
+  .g6-component-tooltip {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 0px 10px 24px 10px;
+    box-shadow: rgb(174, 174, 174) 0px 0px 10px;
+  }
+`);
+
 onMounted(() => {
     initMenu()
     initGraph()
@@ -203,11 +212,9 @@ function initMenu()
 
 function hideAnchorPointsVisibility(item)
 {
-    console.log(item)
     const anchorPoints = item.getContainer().findAll(ele => ele.get('name') === 'anchor-point');
     anchorPoints.forEach(point => {
-        console.log(point)
-        point.attr({opacity:0})
+        point.attr({opacity:0.5})
     })
 }
 
@@ -215,7 +222,6 @@ function showAnchorPointsVisibility(item)
 {
     const anchorPoints = item.getContainer().findAll(ele => ele.get('name') === 'anchor-point');
     anchorPoints.forEach(point => {
-        console.log(point)
         point.attr({opacity:1})
     })
 }
@@ -263,10 +269,13 @@ function register(inNum, outNum, inPar, outPar) {
               visible: true, // invisible by default, shows up when links > 1 or the node is in showAnchors state
               draggable: true, // allow to catch the drag events on this shape
               pointType: isEntryPoint ? 'entry' : 'exit', // 入点或出点
-              parType: isEntryPoint ? inPar[i].type : outPar[i-inNum].type
+              parType: isEntryPoint ? inPar[i].type : outPar[i-inNum].type,
+              parName: isEntryPoint ? inPar[i].name : outPar[i-inNum].name,
+              parTag: isEntryPoint ? inPar[i].tag : outPar[i-inNum].tag,
           })
       })
     },
+
     // response the state changes and show/hide the link-point circles
     setState(name, value, item) {
       if (name === 'showAnchors') {
@@ -281,13 +290,70 @@ function register(inNum, outNum, inPar, outPar) {
   return newName
 }
 
+function initTooltip() {
+  const tooltip = new G6.Tooltip({
+    offsetX: 10,
+    offsetY: 10,
+    getContent(e) {
+      const outDiv = document.createElement('div')
+      outDiv.style.width = '180px'
+      let type = e.item.getType();
+      if(type == 'node') {
+        if(e.target.get('name') == 'anchor-point') {
+          outDiv.innerHTML = `
+          <h4>Anchor Point</h4>
+          <ul><li>Name: ${e.target.get('parName')}</li></ul>
+          <ul><li>Type: ${e.target.get('parType')}</li></ul>
+          <ul><li>Tag: ${e.target.get('parTag')}</li></ul>
+          `
+          return outDiv
+        } 
+        else {
+          outDiv.innerHTML = `
+          <h4>Node</h4>
+          <ul><li>ID: ${e.item.getID()}</li></ul>
+          <ul><li>Code: ${e.item.getModel().label || e.item.getModel().id}</li></ul>
+          `
+          return outDiv
+        }
+      } 
+      else if(type == 'edge') {
+        let sourceClassName = nodes.value.find(ele => ele.id==e.item.getSource().getID()).className;
+        let targetClassName = nodes.value.find(ele => ele.id==e.item.getTarget().getID()).className;
+        let sourceClass = classes.find(item => item.class_name == sourceClassName);
+        let targetClass = classes.find(item => item.class_name == targetClassName);
+        let sourceAP = sourceClass.output_params[e.item.getModel().sourceAnchor-sourceClass.input_num]
+        let targetAP = targetClass.input_params[e.item.getModel().targetAnchor]
+        outDiv.innerHTML = `
+        <h4>Edge</h4>
+        <h5>Source:</h5>
+        <ul>
+          <li>Name: ${sourceAP.name}</li>
+          <li>Type: ${sourceAP.type}</li>
+          <li>Tag: ${sourceAP.tag}</li>
+        </ul>
+        <h5>Target:</h5>
+        <ul>
+          <li>Name: ${targetAP.name}</li>
+          <li>Type: ${targetAP.type}</li>
+          <li>Tag: ${targetAP.tag}</li>
+        </ul>
+        `
+        return outDiv
+      }
+    },
+    itemTypes: ['node','edge']
+  })
+  return tooltip
+}
+
 function initGraph() {
-  // register()
+  const tooltip = initTooltip()
   graph.value = new G6.Graph({
     container: 'container',
     width: 800,
     height: 600,
-    plugins:[menu],
+    plugins:[menu,tooltip],
     modes: {
       default: [
       // config the shouldBegin for drag-node to avoid node moving while dragging on the anchor-point circles
@@ -314,7 +380,6 @@ function initGraph() {
           shouldEnd: e => {
               // avoid ending at other shapes on the node
               if (e.target && e.target.get('name') !== 'anchor-point') return false;
-              console.log(curVarType)
               if (e.target.get('pointType') != 'entry') return false;
               if (e.target.get('parType') != curVarType) {
                 alert(`出点的类型为: ${curVarType}，入点的类型为: ${e.target.get('parType')}，二者类型不同，不能相互连接。`);
@@ -368,8 +433,6 @@ function initGraph() {
 
       // update the curveOffset for parallel edges
       const tempEdges = graph.value.save().edges;
-      console.log(graph.value.save().edges[0])
-      console.log(tempEdges[0])
       edges.value = tempEdges
       processParallelEdgesOnAnchorPoint(tempEdges);
       graph.value.getEdges().forEach((edge, i) => {
@@ -433,7 +496,7 @@ function initGraph() {
     hideAnchorPointsVisibility(e.item)
   })
   graph.value.on('node:dragleave', e => {
-    console.log("dragleave")
+    // console.log("dragleave")
     // graph.value.setItemState(e.item, 'showAnchors', false);
     hideAnchorPointsVisibility(e.item)
   })
@@ -443,7 +506,7 @@ function initGraph() {
   })
   graph.value.on('node:dragend', e => {
     // graph.value.setItemState(e.item, 'showAnchors', false);
-    console.log('dragend')
+    // console.log('dragend')
     hideAnchorPointsVisibility(e.item)
   })
   // Initial render
@@ -453,7 +516,7 @@ function initGraph() {
 function onDragStart(event, className) {
   let dragClass = classes.find(item => item.class_name == className);
   event.dataTransfer.setData('className', dragClass.class_name)
-  console.log(dragClass.class_name)
+  // console.log("Drag Class: ", dragClass.class_name)
 }
 
 function setupDragEvents() {
@@ -470,8 +533,6 @@ function setupDragEvents() {
     //     point.attr({opacity:0})
     // })
     event.preventDefault();
-    console.log("triggered drop")
-    console.log(event)
     let className = event.dataTransfer.getData('className');
     let dragClass = classes.find(item => item.class_name == className);
     let inNum = dragClass.input_num;
@@ -481,7 +542,7 @@ function setupDragEvents() {
     let text = dragClass.code;
     event.dataTransfer.clearData();
     let nodeType = register(inNum, outNum, inPar, outPar);
-    console.log(categories.value)
+    // console.log(categories.value)
     if (nodeType) {
       const model = {
         id: `${nodeType}-${nodes.value.length}`,
@@ -494,35 +555,11 @@ function setupDragEvents() {
           "fill": categories.value[dragClass.category].models[0].color
         }
       };
-      console.log(edges)
       nodes.value.push(model); // Add node to nodes array
       updateGraph(); // Re-render the graph
     }
   });
 }
-
-// function onNodeClick(evt) {
-//   const { item } = evt;
-//   const clickedNodeId = item.getID();
-//   if (selectedNodeId.value && selectedNodeId.value !== clickedNodeId) {
-//     const newEdge = {
-//       source: selectedNodeId.value,
-//       target: clickedNodeId,
-//       label: `edge from ${selectedNodeId.value} to ${clickedNodeId}`,
-//       style: {
-//         endArrow: {
-//           path: G6.Arrow.vee(10, 10, 10),
-//           d: 10,
-//         },
-//       },
-//     };
-//     edges.value.push(newEdge); // Add edge to edges array
-//     updateGraph(); // Re-render the graph
-//     selectedNodeId.value = null; // Reset selected node
-//   } else {
-//     selectedNodeId.value = clickedNodeId; // Set this node as selected
-//   }
-// }
 
 function updateGraph() {
   // Use nodes and edges data to update the graph
@@ -534,7 +571,6 @@ function updateGraph() {
     nodes: nodes.value,
     edges: edges.value,
   });
-  console.log(edges.value)
   G6.Util.processParallelEdges(edges.value);
   sourceAnchorIdx = null;
   graph.value.render();
