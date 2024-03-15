@@ -40,6 +40,7 @@ import {ref, onMounted} from 'vue'
 const selectedClassName = ref('')
 const selectedClassInputParams = ref([])
 const selectedClassCode = ref('')
+let count = 0;
 
 const detailDialogVisible = ref(false);
 const processParallelEdgesOnAnchorPoint = (
@@ -153,7 +154,7 @@ let nodes = ref([])
 let edges = ref([])
 // let selectedNodeId = ref(null)
 let sourceAnchorIdx, targetAnchorIdx
-const menu = ref(null)
+// const menu = ref(null)
 
 import classesData from '@/static/classes.json'
 
@@ -170,45 +171,10 @@ insertCss(`
 `);
 
 onMounted(() => {
-    initMenu()
     initGraph()
+    initMenu()
     setupDragEvents()
 })
-
-function initMenu()
-{
-    menu.value = new G6.Menu({
-        getContent(evt) {
-        let header;
-        if (evt.target && evt.target.isCanvas && evt.target.isCanvas()) {
-          header = 'Canvas ContextMenu';
-        } else if (evt.item) {
-          const itemType = evt.item.getType();
-          header = `${itemType.toUpperCase()} ContextMenu`;
-        }
-        return `
-        <h3>${header}</h3>
-        <ul>
-          <li title='1'>li 1</li>
-          <li title='2'>li 2</li>
-          <li>li 3</li>
-          <li>li 4</li>
-          <li>li 5</li>
-        </ul>`;
-        },
-        handleMenuClick: (target, item) => {
-          console.log(target, item);
-        },
-        // offsetX and offsetY include the padding of the parent container
-        // 需要加上父级容器的 padding-left 16 与自身偏移量 10
-        offsetX: 16 + 10,
-        // 需要加上父级容器的 padding-top 24 、画布兄弟元素高度、与自身偏移量 10
-        offsetY: 0,
-        // the types of items that allow the menu show up
-        // 在哪些类型的元素上响应
-        itemTypes: ['node', 'edge', 'canvas'],
-    })
-}
 
 function hideAnchorPointsVisibility(item)
 {
@@ -241,6 +207,7 @@ function getRectAnchors(inNum, outNum) {
 }
 
 function register(inNum, outNum, inPar, outPar) {
+  count++;
   let newName = `rect-node-${inNum}-${outNum}`
   G6.registerNode(newName,{
     getAnchorPoints(cfg) {
@@ -287,6 +254,7 @@ function register(inNum, outNum, inPar, outPar) {
       }
     }
   }, 'rect')
+  console.log(newName)
   return newName
 }
 
@@ -347,8 +315,61 @@ function initTooltip() {
   return tooltip
 }
 
+function test()
+{
+    console.log('test')
+}
+
+function initMenu()
+{
+    const menu = new G6.Menu({
+        getContent(evt) {
+        let header;
+        if (evt.target && evt.target.isCanvas && evt.target.isCanvas()) {
+          header = 'Canvas ContextMenu';
+        } else if (evt.item) {
+          const itemType = evt.item.getType();
+          header = `${itemType.toUpperCase()} ContextMenu`;
+        }
+        const outDiv = document.createElement('div');
+        outDiv.style.cursor = 'pointer'
+        outDiv.innerHTML = '<p id="deleteNode">删除节点</p>'
+        console.log(outDiv)
+        // let btn = outDiv.querySelector('#deleteNode')
+        // console.log(btn)
+        // btn.addEventListener('click', test)
+        // return `
+        // <h3>${header}</h3>
+        // <ul>
+        //   <li title='1'>li 1</li>
+        //   <li title='2'>li 2</li>
+        //   <li>li 3</li>
+        //   <li>li 4</li>
+        //   <li>li 5</li>
+        // </ul>`;
+        return outDiv
+        },
+        handleMenuClick: (target, item) => {
+          console.log(target, item);
+          graph.value.removeItem(item);
+          edges.value = graph.value.save().edges
+          nodes.value = graph.value.save().nodes
+        },
+        // offsetX and offsetY include the padding of the parent container
+        // 需要加上父级容器的 padding-left 16 与自身偏移量 10
+        offsetX: 16 + 10,
+        // 需要加上父级容器的 padding-top 24 、画布兄弟元素高度、与自身偏移量 10
+        offsetY: 0,
+        // the types of items that allow the menu show up
+        // 在哪些类型的元素上响应
+        itemTypes: ['node', 'edge'],
+    })
+    return menu;
+}
+
 function initGraph() {
   const tooltip = initTooltip()
+  const menu = initMenu()
   graph.value = new G6.Graph({
     container: 'container',
     width: 800,
@@ -425,6 +446,7 @@ function initGraph() {
   // graph.value.on('node:click', onNodeClick);
 
   graph.value.on('aftercreateedge', (e) => {
+      // count++;
       // update the sourceAnchor and targetAnchor for the newly added edge
       graph.value.updateItem(e.edge, {
           sourceAnchor: sourceAnchorIdx,
@@ -445,6 +467,7 @@ function initGraph() {
   });
   // // after drag from the first node, the edge is created, update the sourceAnchor
   graph.value.on('afteradditem', (e) => {
+      // count++;
        if (e.item && e.item.getType() === 'edge' && sourceAnchorIdx != null) {
           graph.value.updateItem(e.item, {
               sourceAnchor: sourceAnchorIdx
@@ -545,7 +568,7 @@ function setupDragEvents() {
     // console.log(categories.value)
     if (nodeType) {
       const model = {
-        id: `${nodeType}-${nodes.value.length}`,
+        id: `${nodeType}-${count}`,
         className: className,
         x: event.offsetX,
         y: event.offsetY,
