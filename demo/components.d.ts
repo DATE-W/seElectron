@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AttrWindow: typeof import('./src/components/attrWindow.vue')['default']
     ElDialog: typeof import('element-plus/es')['ElDialog']
     Graph: typeof import('./src/components/Graph.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

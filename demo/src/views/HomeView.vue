@@ -19,27 +19,18 @@
     <div id="container" style="flex-grow: 1; height: 600px; border: 1px solid #ccc;"></div>
   </div>
   <div><button @click="saveGraph">save</button></div>
-  <div>
-    <el-dialog
-    title="Warning"
-    width="500"
-    align-center
-    v-model="detailDialogVisible">
-      <div style="display:flex; flex-direction: column;">
-        class-name:{{ selectedClassName }}
-      </div>
-    </el-dialog>
+  <div v-show="selectedItem" v-if="selectedItem">
+    <attrWindow id="attrWindow1" style="width:500px" :item="selectedItem"/>
   </div>
 </template>
 
 <script setup name="GraphEditor">
 import G6, { Tooltip } from '@antv/g6';
 import {ref, onMounted} from 'vue'
+// import attrWindow from '@/components/attrWindow.vue';
 
 // display
-const selectedClassName = ref('')
-const selectedClassInputParams = ref([])
-const selectedClassCode = ref('')
+const selectedItem = ref(null)
 let count = 0;
 
 const detailDialogVisible = ref(false);
@@ -496,8 +487,13 @@ function initGraph() {
     console.log(e.item)
     if(e.item && e.item.getType() !== 'edge')
     {
-      detailDialogVisible.value = true;
-      selectedClassName.value = e.item._cfg.model.className;
+      selectedItem.value = e.item._cfg.model
+      // selectedItem.value.className = "123123"
+      console.log(e.item._cfg.model)
+    }
+    else
+    {
+      selectedItem.value = null;
     }
   })
 
