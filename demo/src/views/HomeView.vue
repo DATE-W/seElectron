@@ -20,12 +20,12 @@
   </div>
   <div><button @click="saveGraph">save</button></div>
   <div v-show="selectedItem" v-if="selectedItem">
-    <attrWindow id="attrWindow1" style="width:500px" :item="selectedItem"/>
+    <attrWindow id="attrWindow1" style="width:500px" :item="selectedItem" @update="handleUpdate"/>
   </div>
 </template>
 
 <script setup name="GraphEditor">
-import G6, { Tooltip } from '@antv/g6';
+import G6 from '@antv/g6';
 import {ref, onMounted} from 'vue'
 // import attrWindow from '@/components/attrWindow.vue';
 
@@ -33,7 +33,6 @@ import {ref, onMounted} from 'vue'
 const selectedItem = ref(null)
 let count = 0;
 
-const detailDialogVisible = ref(false);
 const processParallelEdgesOnAnchorPoint = (
     edges,
     offsetDiff = 15,
@@ -143,7 +142,6 @@ const categories = ref([
 let graph = ref(null)
 let nodes = ref([])
 let edges = ref([])
-// let selectedNodeId = ref(null)
 let sourceAnchorIdx, targetAnchorIdx
 // const menu = ref(null)
 
@@ -151,6 +149,8 @@ import classesData from '@/static/classes.json'
 
 let classes = classesData.classes
 let curVarType = ref('')
+
+let isDragging = ref(false)
 
 import insertCss from 'insert-css';
 insertCss(`
@@ -306,9 +306,13 @@ function initTooltip() {
   return tooltip
 }
 
-function test()
-{
-    console.log('test')
+// 处理子组件发出的更新
+function handleUpdate(updatedItem) {
+  if (isDragging.value == true) {
+    return;
+  }
+  selectedItem.value = updatedItem;
+  updateGraph(); // 调用更新图表的方法
 }
 
 function initMenu()
@@ -368,6 +372,8 @@ function initGraph() {
     plugins:[menu,tooltip],
     modes: {
       default: [
+      'drag-canvas',
+      'zoom-canvas', 
       // config the shouldBegin for drag-node to avoid node moving while dragging on the anchor-point circles
       {
           type: 'drag-node',
@@ -521,11 +527,13 @@ function initGraph() {
   })
   graph.value.on('node:dragstart', e => {
     // graph.value.setItemState(e.item, 'showAnchors', true);
+    isDragging.value = true;
     showAnchorPointsVisibility(e.item)
   })
   graph.value.on('node:dragend', e => {
     // graph.value.setItemState(e.item, 'showAnchors', false);
     // console.log('dragend')
+    isDragging.value = false;
     hideAnchorPointsVisibility(e.item)
   })
   // Initial render
@@ -551,6 +559,7 @@ function setupDragEvents() {
     //     console.log(point)
     //     point.attr({opacity:0})
     // })
+    console.log("cececes")
     event.preventDefault();
     let className = event.dataTransfer.getData('className');
     let dragClass = classes.find(item => item.class_name == className);
@@ -582,7 +591,11 @@ function setupDragEvents() {
 
 function updateGraph() {
   // Use nodes and edges data to update the graph
-  edges.value.forEach((edge, i)=>{
+  // edges.value.forEach((edge, i)=>{
+  //   console.log(i);
+  //   console.log(edge)
+  // })
+  nodes.value.forEach((edge, i)=>{
     console.log(i);
     console.log(edge)
   })
