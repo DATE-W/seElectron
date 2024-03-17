@@ -18,7 +18,11 @@
     
     <div id="container" style="flex-grow: 1; height: 600px; border: 1px solid #ccc;"></div>
   </div>
-  <div><button @click="saveGraph">save</button></div>
+  <div>
+    <button @click="saveGraph">SAVE</button>
+    <!-- <button @click="loadGraph">LOAD</button> -->
+    <input type="file" ref="fileInput" @change="loadGraph">
+  </div>
   <div v-show="selectedItem" v-if="selectedItem">
     <attrWindow id="attrWindow1" style="width:500px" :item="selectedItem" @update="handleUpdate"/>
   </div>
@@ -230,6 +234,7 @@ function register(inNum, outNum, inPar, outPar) {
               parType: isEntryPoint ? inPar[i].type : outPar[i-inNum].type,
               parName: isEntryPoint ? inPar[i].name : outPar[i-inNum].name,
               parTag: isEntryPoint ? inPar[i].tag : outPar[i-inNum].tag,
+              available: true
           })
       })
     },
@@ -328,7 +333,7 @@ function initMenu()
         }
         const outDiv = document.createElement('div');
         outDiv.style.cursor = 'pointer'
-        outDiv.innerHTML = '<p id="deleteNode">删除节点</p>'
+        outDiv.innerHTML = '<p id="deleteNode">删除</p>'
         console.log(outDiv)
         // let btn = outDiv.querySelector('#deleteNode')
         // console.log(btn)
@@ -399,6 +404,10 @@ function initGraph() {
               // avoid ending at other shapes on the node
               if (e.target && e.target.get('name') !== 'anchor-point') return false;
               if (e.target.get('pointType') != 'entry') return false;
+              if (e.target.get('available') == false) {
+                alert("已经……被塞满了……")
+                return false;
+              }
               if (e.target.get('parType') != curVarType) {
                 alert(`出点的类型为: ${curVarType}，入点的类型为: ${e.target.get('parType')}，二者类型不同，不能相互连接。`);
                 curVarType = '';
@@ -407,6 +416,7 @@ function initGraph() {
               if (e.target) {
                   targetAnchorIdx = e.target.get('anchorPointIdx');
                   e.target.set('links', e.target.get('links') + 1);  // cache the number of edge connected to this anchor-point circle
+                  e.target.set('available', false);
                   return true;
               }
 
@@ -474,6 +484,7 @@ function initGraph() {
   // if create-edge is canceled before ending, update the 'links' on the anchor-point circles
   graph.value.on('afterremoveitem', e => {
     if (e.item && e.item.source && e.item.target) {
+      console.log(e.item)
         const sourceNode = graph.value.findById(e.item.source);
         const targetNode = graph.value.findById(e.item.target);
         const { sourceAnchor, targetAnchor } = e.item;
@@ -484,6 +495,8 @@ function initGraph() {
         if (targetNode && !isNaN(targetAnchor)) {
             const targetAnchorShape = targetNode.getContainer().find(ele => (ele.get('name') === 'anchor-point' && ele.get('anchorPointIdx') === targetAnchor));
             targetAnchorShape.set('links', targetAnchorShape.get('links') - 1);
+            let anchor=(targetNode.getContainer().findAll(ele => ele.get('name') === 'anchor-point'))[e.item.targetAnchor]
+            anchor.set('available', true)
         }
     }
   })
@@ -590,11 +603,6 @@ function setupDragEvents() {
 }
 
 function updateGraph() {
-  // Use nodes and edges data to update the graph
-  // edges.value.forEach((edge, i)=>{
-  //   console.log(i);
-  //   console.log(edge)
-  // })
   nodes.value.forEach((edge, i)=>{
     console.log(i);
     console.log(edge)
@@ -611,8 +619,45 @@ function updateGraph() {
 function saveGraph() {
   const data = graph.value.save();
   const dataStr = JSON.stringify(data, null, 2); 
+  console.log("Saved:")
   console.log(dataStr)
+  const blob = new Blob([dataStr], { type: 'application/json' }); // 创建一个 Blob 对象
+
+      const url = URL.createObjectURL(blob); // 创建一个 URL 对象
+
+      // 创建一个 <a> 标签，并设置其属性，模拟用户点击下载
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'saved.json'; // 下载文件的文件名
+      
+      // 触发点击事件以下载文件
+      document.body.appendChild(link);
+      link.click();
+
+      // 清理 URL 对象
+      URL.revokeObjectURL(url);
+      document.body.removeChild(link);
 }
+
+function loadGraph(event) {
+  const file = event.target.files[0]; // 获取用户选择的文件
+  if (!file) return;
+  const reader = new FileReader(); // 创建一个FileReader对象
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result); // 读取文件内容并解析为 JSON
+      console.log(data)
+      nodes.value = data.nodes
+      edges.value = data.edges
+      updateGraph()
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  reader.readAsText(file); // 以文本形式读取文件内容
+}
+
 </script>
 
 
