@@ -147,6 +147,7 @@ let graph = ref(null)
 let nodes = ref([])
 let edges = ref([])
 let sourceAnchorIdx, targetAnchorIdx
+let registeredNodes = ref([])
 // const menu = ref(null)
 
 import classesData from '@/static/classes.json'
@@ -203,6 +204,7 @@ function getRectAnchors(inNum, outNum) {
 
 function register(inNum, outNum, inPar, outPar) {
   count++;
+  registeredNodes.value.push([inNum, outNum, inPar, outPar])
   let newName = `rect-node-${inNum}-${outNum}`
   G6.registerNode(newName,{
     getAnchorPoints(cfg) {
@@ -617,26 +619,28 @@ function updateGraph() {
 }
 
 function saveGraph() {
-  const data = graph.value.save();
-  const dataStr = JSON.stringify(data, null, 2); 
+  const graphData = graph.value.save();
+  const graphDataStr = JSON.stringify(graphData, null, 2); 
+  const registerData = null; // 自定义Node信息（inNum, outNum, inPar, outPar），load后重新注册
+  const classesData = null; // 类信息
+  // const 
   console.log("Saved:")
-  console.log(dataStr)
-  const blob = new Blob([dataStr], { type: 'application/json' }); // 创建一个 Blob 对象
+  console.log(graphDataStr) // nodes edges
+  console.log(JSON.stringify(registeredNodes.value))
 
-      const url = URL.createObjectURL(blob); // 创建一个 URL 对象
+  // const blob = new Blob([dataStr], { type: 'application/json' }); // 创建一个 Blob 对象
 
-      // 创建一个 <a> 标签，并设置其属性，模拟用户点击下载
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'saved.json'; // 下载文件的文件名
-      
-      // 触发点击事件以下载文件
-      document.body.appendChild(link);
-      link.click();
-
-      // 清理 URL 对象
-      URL.revokeObjectURL(url);
-      document.body.removeChild(link);
+  // const url = URL.createObjectURL(blob); // 创建一个 URL 对象
+  // // 创建一个 <a> 标签，并设置其属性，模拟用户点击下载
+  // const link = document.createElement('a');
+  // link.href = url;
+  // link.download = 'saved.json'; // 下载文件的文件名
+  // // 触发点击事件以下载文件
+  // document.body.appendChild(link);
+  // link.click();
+  // // 清理 URL 对象
+  // URL.revokeObjectURL(url);
+  // document.body.removeChild(link);
 }
 
 function loadGraph(event) {
