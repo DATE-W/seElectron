@@ -14,6 +14,53 @@
           {{ model.description }}
         </div>
       </div>
+      <div id="class-adder">
+        <el-button @click="addClassDialogVisible=true">新增类</el-button>
+        <el-dialog v-model="addClassDialogVisible" title="新增类">
+          <el-form :model="addClassForm" label-width="100px">
+            <el-form-item label="类名">
+              <el-input v-model="addClassForm.className" placeholder="请输入类名"></el-input>
+            </el-form-item>
+            <el-form-item label="代码">
+              <el-input v-model="addClassForm.code" placeholder="请输入类代码"></el-input>
+            </el-form-item>
+            <el-form-item label="入参信息">
+              <el-row v-for="(param, index) in addClassForm.inParams" :key="index">
+                <el-col :span="8">
+                  <el-input v-model="param.name" placeholder="名称"></el-input>
+                </el-col>
+                <el-col :span="8">
+                  <el-input v-model="param.type" placeholder="类型"></el-input>
+                </el-col>
+                <el-col :span="8">
+                  <el-input v-model="param.tag" placeholder="标签"></el-input>
+                </el-col>
+                <el-button plain type="danger" @click="removeClassInParam(index)">移除</el-button>
+              </el-row>
+              <el-button @click="addClassInParam('input')">新增入参</el-button>
+            </el-form-item>
+            <el-form-item label="出参信息">
+              <el-row v-for="(param, index) in addClassForm.outParams" :key="index">
+                <el-col :span="8">
+                  <el-input v-model="param.name" placeholder="名称"></el-input>
+                </el-col>
+                <el-col :span="8">
+                  <el-input v-model="param.type" placeholder="类型"></el-input>
+                </el-col>
+                <el-col :span="8">
+                  <el-input v-model="param.tag" placeholder="标签"></el-input>
+                </el-col>
+                <el-button plain type="danger" @click="removeClassOutParam(index)">移除</el-button>
+              </el-row>
+              <el-button @click="addClassOutParam('output')">新增出参</el-button>
+            </el-form-item>
+          </el-form>
+          <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="saveAddClass">保 存</el-button>
+            <el-button @click="addClassDialogVisible = false">取 消</el-button>
+          </span>
+        </el-dialog>
+      </div>
     </div>
     
     <div id="container" style="flex-grow: 1; height: 600px; border: 1px solid #ccc;"></div>
@@ -140,6 +187,12 @@ const categories = ref([
       { class_name: "D", description: "矩形-1-3(D)", color: "#FFD700" },
     ]
   },
+  {
+    categoryName: "自定义类",
+    models: [
+
+    ]
+  },
 ]);
 
 
@@ -153,18 +206,59 @@ let registeredNodes = ref([])
 import classesData from '@/static/classes.json'
 
 let classes = classesData.classes
-let curVarType = ref('')
 
+let curVarType = ref('')
 let isDragging = ref(false)
 
-import insertCss from 'insert-css';
-insertCss(`
-  .g6-component-tooltip {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 0px 10px 24px 10px;
-    box-shadow: rgb(174, 174, 174) 0px 0px 10px;
-  }
-`);
+// for newly-added class
+let addClassDialogVisible = ref(false)
+let addClassForm = ref({
+  className: '',
+  code: '',
+  inParams: [],
+  outParams: []
+})
+
+function addClassInParam() {
+  addClassForm.value.inParams.push({ name: '', type: '', tag: '' });
+}
+
+function addClassOutParam() {
+  addClassForm.value.outParams.push({ name: '', type: '', tag: '' });
+}
+
+function removeClassInParam(index) {
+  addClassForm.value.inParams.splice(index, 1);
+}
+
+function removeClassOutParam(index) {
+  addClassForm.value.outParams.splice(index, 1);
+}
+
+function saveAddClass() {
+  console.log("Save Added Class")
+  classes.push({
+    class_name: addClassForm.value.className,
+    code: addClassForm.value.code,
+    input_num: addClassForm.value.inParams.length,
+    output_num: addClassForm.value.outParams.length,
+    input_params: addClassForm.value.inParams,
+    output_params: addClassForm.value.outParams,
+    category: 2
+  })
+  console.log(classes)
+
+  categories.value.find(item => item.categoryName=="自定义类").models.push({
+    class_name: addClassForm.value.className, 
+    description: `矩形-${addClassForm.value.inParams.length}-${addClassForm.value.outParams.length}`, 
+    color: "#00D7FF" 
+  })
+
+  addClassDialogVisible.value = false
+  addClassForm.value.className = ''
+  addClassForm.value.inParams = []
+  addClassForm.value.outParams = []
+}
 
 onMounted(() => {
     initGraph()
@@ -676,5 +770,10 @@ function loadGraph(event) {
   border-radius:10%;
   justify-content: center;
   align-items: center;
+}
+.g6-component-tooltip {
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 0px 10px 24px 10px;
+  box-shadow: rgb(174, 174, 174) 0px 0px 10px;
 }
 </style>
