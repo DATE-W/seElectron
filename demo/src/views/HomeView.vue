@@ -575,30 +575,35 @@ function initGraph() {
   });
   // // after drag from the first node, the edge is created, update the sourceAnchor
   graph.value.on('afteradditem', (e) => {
-      // count++;
-       if (e.item && e.item.getType() === 'edge' && sourceAnchorIdx != null) {
-          graph.value.updateItem(e.item, {
-              sourceAnchor: sourceAnchorIdx
-          });
-      }
+    if (e.item && e.item.getType() === 'edge' && sourceAnchorIdx != null) {
+      graph.value.updateItem(e.item, {
+          sourceAnchor: sourceAnchorIdx
+      });
+    }
+    if (e.item && e.item.getType() === 'edge') {
+      let targetNode = graph.value.findById(e.item.get("target").getID())
+      let anchor=(targetNode.getContainer().findAll(ele => ele.get('name') === 'anchor-point'))[e.item.get("model").targetAnchor]
+      if (anchor)
+        anchor.set('available', false)
+    }
   })
   // if create-edge is canceled before ending, update the 'links' on the anchor-point circles
   graph.value.on('afterremoveitem', e => {
     if (e.item && e.item.source && e.item.target) {
-      console.log(e.item)
-        const sourceNode = graph.value.findById(e.item.source);
-        const targetNode = graph.value.findById(e.item.target);
-        const { sourceAnchor, targetAnchor } = e.item;
-        if (sourceNode && !isNaN(sourceAnchor)) {
-            const sourceAnchorShape = sourceNode.getContainer().find(ele => (ele.get('name') === 'anchor-point' && ele.get('anchorPointIdx') === sourceAnchor));
-            sourceAnchorShape.set('links', sourceAnchorShape.get('links') - 1);
-        }
-        if (targetNode && !isNaN(targetAnchor)) {
-            const targetAnchorShape = targetNode.getContainer().find(ele => (ele.get('name') === 'anchor-point' && ele.get('anchorPointIdx') === targetAnchor));
-            targetAnchorShape.set('links', targetAnchorShape.get('links') - 1);
-            let anchor=(targetNode.getContainer().findAll(ele => ele.get('name') === 'anchor-point'))[e.item.targetAnchor]
-            anchor.set('available', true)
-        }
+      // console.log(e.item)
+      const sourceNode = graph.value.findById(e.item.source);
+      const targetNode = graph.value.findById(e.item.target);
+      const { sourceAnchor, targetAnchor } = e.item;
+      if (sourceNode && !isNaN(sourceAnchor)) {
+          const sourceAnchorShape = sourceNode.getContainer().find(ele => (ele.get('name') === 'anchor-point' && ele.get('anchorPointIdx') === sourceAnchor));
+          sourceAnchorShape.set('links', sourceAnchorShape.get('links') - 1);
+      }
+      if (targetNode && !isNaN(targetAnchor)) {
+          const targetAnchorShape = targetNode.getContainer().find(ele => (ele.get('name') === 'anchor-point' && ele.get('anchorPointIdx') === targetAnchor));
+          targetAnchorShape.set('links', targetAnchorShape.get('links') - 1);
+          let anchor=(targetNode.getContainer().findAll(ele => ele.get('name') === 'anchor-point'))[e.item.targetAnchor]
+          anchor.set('available', true)
+      }
     }
   })
 
@@ -747,6 +752,16 @@ function loadGraph(event) {
       console.log("Load:", file)
       count = 0
       classes = data.classesData
+      classes.forEach(cla => {
+        if (cla.category == 2) {
+          categories.value.find(item => item.categoryName=="自定义类").models.push({
+            class_name: cla.class_name, 
+            description: `矩形-${cla.input_num}-${cla.output_num}`, 
+            color: "#00D7FF" 
+          })
+        }
+      })
+
       let registered = data.registerData
       registered.forEach(node => {
         register(node.input_num,node.output_num,node.input_params,node.output_params)
