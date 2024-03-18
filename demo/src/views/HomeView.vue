@@ -298,7 +298,12 @@ function getRectAnchors(inNum, outNum) {
 
 function register(inNum, outNum, inPar, outPar) {
   count++;
-  registeredNodes.value.push([inNum, outNum, inPar, outPar])
+  registeredNodes.value.push({
+    input_num: inNum, 
+    output_num: outNum, 
+    input_params: inPar, 
+    output_params: outPar
+  })
   let newName = `rect-node-${inNum}-${outNum}`
   G6.registerNode(newName,{
     getAnchorPoints(cfg) {
@@ -346,7 +351,7 @@ function register(inNum, outNum, inPar, outPar) {
       }
     }
   }, 'rect')
-  console.log(newName)
+  console.log("register node:",newName)
   return newName
 }
 
@@ -699,10 +704,6 @@ function setupDragEvents() {
 }
 
 function updateGraph() {
-  nodes.value.forEach((edge, i)=>{
-    console.log(i);
-    console.log(edge)
-  })
   graph.value.data({
     nodes: nodes.value,
     edges: edges.value,
@@ -713,28 +714,27 @@ function updateGraph() {
 }
 
 function saveGraph() {
-  const graphData = graph.value.save();
-  const graphDataStr = JSON.stringify(graphData, null, 2); 
-  const registerData = null; // 自定义Node信息（inNum, outNum, inPar, outPar），load后重新注册
-  const classesData = null; // 类信息
-  // const 
-  console.log("Saved:")
-  console.log(graphDataStr) // nodes edges
-  console.log(JSON.stringify(registeredNodes.value))
+  // 将数据组合成一个对象
+  const jsonData = {
+    // count:count,
+    classesData: classes,
+    registerData: registeredNodes.value, // 自定义Node信息（inNum, outNum, inPar, outPar），load后重新注册
+    graphData: graph.value.save(),
+  };
+  const jsonDataStr = JSON.stringify(jsonData, null, 2);
+  const blob = new Blob([jsonDataStr], { type: 'application/json' }); // 创建一个 Blob 对象
 
-  // const blob = new Blob([dataStr], { type: 'application/json' }); // 创建一个 Blob 对象
-
-  // const url = URL.createObjectURL(blob); // 创建一个 URL 对象
-  // // 创建一个 <a> 标签，并设置其属性，模拟用户点击下载
-  // const link = document.createElement('a');
-  // link.href = url;
-  // link.download = 'saved.json'; // 下载文件的文件名
-  // // 触发点击事件以下载文件
-  // document.body.appendChild(link);
-  // link.click();
-  // // 清理 URL 对象
-  // URL.revokeObjectURL(url);
-  // document.body.removeChild(link);
+  const url = URL.createObjectURL(blob); // 创建一个 URL 对象
+  // 创建一个 <a> 标签，并设置其属性，模拟用户点击下载
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `saved-${Date.now()}.json`; // 下载文件的文件名
+  // 触发点击事件以下载文件
+  document.body.appendChild(link);
+  link.click();
+  // 清理 URL 对象
+  URL.revokeObjectURL(url);
+  document.body.removeChild(link);
 }
 
 function loadGraph(event) {
@@ -744,9 +744,16 @@ function loadGraph(event) {
   reader.onload = () => {
     try {
       const data = JSON.parse(reader.result); // 读取文件内容并解析为 JSON
-      console.log(data)
-      nodes.value = data.nodes
-      edges.value = data.edges
+      console.log("Load:", file)
+      count = 0
+      classes = data.classesData
+      let registered = data.registerData
+      registered.forEach(node => {
+        register(node.input_num,node.output_num,node.input_params,node.output_params)
+      })
+      
+      edges.value = data.graphData.edges
+      nodes.value = data.graphData.nodes
       updateGraph()
     } catch (error) {
       console.error(error);
