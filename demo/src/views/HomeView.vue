@@ -1,21 +1,16 @@
 <template>
   <div style="display:flex">
-    <div
-      id="shape-selector"
-      style="width: 200px; height: 600px; border: 1px solid #ccc; padding: 10px; display:block; flex-direction:column; justify-items:center; align-items:center"
-    >
+    <div id="shape-selector"
+      style="width: 200px; height: 600px; border: 1px solid #ccc; padding: 10px; display:block; flex-direction:column; justify-items:center; align-items:center">
       <div v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
         <h3>{{ category.categoryName }}</h3>
-        <div v-for="model in category.models" :key="model.class_name"
-          class="drag-node model"
-          draggable="true"
-          @dragstart="onDragStart($event, model.class_name)"
-          :style="{ backgroundColor: model.color }">
+        <div v-for="model in category.models" :key="model.class_name" class="drag-node model" draggable="true"
+          @dragstart="onDragStart($event, model.class_name)" :style="{ backgroundColor: model.color }">
           {{ model.description }}
         </div>
       </div>
       <div id="class-adder">
-        <el-button @click="addClassDialogVisible=true">新增类</el-button>
+        <el-button @click="addClassDialogVisible = true">新增类</el-button>
         <el-dialog v-model="addClassDialogVisible" title="新增类">
           <el-form :model="addClassForm" label-width="100px">
             <el-form-item label="类名">
@@ -62,7 +57,7 @@
         </el-dialog>
       </div>
     </div>
-    
+
     <div id="container" style="flex-grow: 1; height: 600px; border: 1px solid #ccc;"></div>
   </div>
   <div>
@@ -71,13 +66,13 @@
     <input type="file" ref="fileInput" @change="loadGraph">
   </div>
   <div v-show="selectedItem" v-if="selectedItem">
-    <attrWindow id="attrWindow1" style="width:500px" :item="selectedItem" @update="handleUpdate"/>
+    <attrWindow id="attrWindow1" style="width:500px" :item="selectedItem" @update="handleUpdate" />
   </div>
 </template>
 
 <script setup name="GraphEditor">
 import G6 from '@antv/g6';
-import {ref, onMounted} from 'vue'
+import { ref, onMounted } from 'vue'
 // import attrWindow from '@/components/attrWindow.vue';
 
 // display
@@ -85,90 +80,90 @@ const selectedItem = ref(null)
 let count = 0;
 
 const processParallelEdgesOnAnchorPoint = (
-    edges,
-    offsetDiff = 15,
-    multiEdgeType = 'quadratic',
-    singleEdgeType = undefined,
-    loopEdgeType = undefined
+  edges,
+  offsetDiff = 15,
+  multiEdgeType = 'quadratic',
+  singleEdgeType = undefined,
+  loopEdgeType = undefined
 ) => {
-    const len = edges.length;
-    const cod = offsetDiff * 2;
-    const loopPosition = [
-        'top',
-        'top-right',
-        'right',
-        'bottom-right',
-        'bottom',
-        'bottom-left',
-        'left',
-        'top-left',
-    ];
-    const edgeMap = {};
-    const tags = [];
-    const reverses = {};
-    for (let i = 0; i < len; i++) {
-        const edge = edges[i];
-        const { source, target, sourceAnchor, targetAnchor } = edge;
-        const sourceTarget = `${source}|${sourceAnchor}-${target}|${targetAnchor}`;
+  const len = edges.length;
+  const cod = offsetDiff * 2;
+  const loopPosition = [
+    'top',
+    'top-right',
+    'right',
+    'bottom-right',
+    'bottom',
+    'bottom-left',
+    'left',
+    'top-left',
+  ];
+  const edgeMap = {};
+  const tags = [];
+  const reverses = {};
+  for (let i = 0; i < len; i++) {
+    const edge = edges[i];
+    const { source, target, sourceAnchor, targetAnchor } = edge;
+    const sourceTarget = `${source}|${sourceAnchor}-${target}|${targetAnchor}`;
 
-        if (tags[i]) continue;
-        if (!edgeMap[sourceTarget]) {
-            edgeMap[sourceTarget] = [];
-        }
-        tags[i] = true;
-        edgeMap[sourceTarget].push(edge);
-        for (let j = 0; j < len; j++) {
-            if (i === j) continue;
-            const sedge = edges[j];
-            const { source: src, target: dst, sourceAnchor: srcAnchor, targetAnchor: dstAnchor } = sedge;
-
-            // 两个节点之间共同的边
-            // 第一条的source = 第二条的target
-            // 第一条的target = 第二条的source
-            if (!tags[j]) {
-                if (source === dst && sourceAnchor === dstAnchor
-                    && target === src && targetAnchor === srcAnchor) {
-                    edgeMap[sourceTarget].push(sedge);
-                    tags[j] = true;
-                    reverses[`${src}|${srcAnchor}|${dst}|${dstAnchor}|${edgeMap[sourceTarget].length - 1}`] = true;
-                } else if (source === src && sourceAnchor === srcAnchor
-                    && target === dst && targetAnchor === dstAnchor) {
-                    edgeMap[sourceTarget].push(sedge);
-                    tags[j] = true;
-                }
-            }
-        }
+    if (tags[i]) continue;
+    if (!edgeMap[sourceTarget]) {
+      edgeMap[sourceTarget] = [];
     }
+    tags[i] = true;
+    edgeMap[sourceTarget].push(edge);
+    for (let j = 0; j < len; j++) {
+      if (i === j) continue;
+      const sedge = edges[j];
+      const { source: src, target: dst, sourceAnchor: srcAnchor, targetAnchor: dstAnchor } = sedge;
 
-    for (const key in edgeMap) {
-        const arcEdges = edgeMap[key];
-        const { length } = arcEdges;
-        for (let k = 0; k < length; k++) {
-            const current = arcEdges[k];
-            if (current.source === current.target) {
-                if (loopEdgeType) current.type = loopEdgeType;
-                // 超过8条自环边，则需要重新处理
-                current.loopCfg = {
-                    position: loopPosition[k % 8],
-                    dist: Math.floor(k / 8) * 20 + 50,
-                };
-                continue;
-            }
-            if (length === 1 && singleEdgeType && (current.source !== current.target || current.sourceAnchor !== current.targetAnchor)) {
-                current.type = singleEdgeType;
-                continue;
-            }
-            current.type = multiEdgeType;
-            const sign =
-                (k % 2 === 0 ? 1 : -1) * (reverses[`${current.source}|${current.sourceAnchor}|${current.target}|${current.targetAnchor}|${k}`] ? -1 : 1);
-            if (length % 2 === 1) {
-                current.curveOffset = sign * Math.ceil(k / 2) * cod;
-            } else {
-                current.curveOffset = sign * (Math.floor(k / 2) * cod + offsetDiff);
-            }
+      // 两个节点之间共同的边
+      // 第一条的source = 第二条的target
+      // 第一条的target = 第二条的source
+      if (!tags[j]) {
+        if (source === dst && sourceAnchor === dstAnchor
+          && target === src && targetAnchor === srcAnchor) {
+          edgeMap[sourceTarget].push(sedge);
+          tags[j] = true;
+          reverses[`${src}|${srcAnchor}|${dst}|${dstAnchor}|${edgeMap[sourceTarget].length - 1}`] = true;
+        } else if (source === src && sourceAnchor === srcAnchor
+          && target === dst && targetAnchor === dstAnchor) {
+          edgeMap[sourceTarget].push(sedge);
+          tags[j] = true;
         }
+      }
     }
-    return edges;
+  }
+
+  for (const key in edgeMap) {
+    const arcEdges = edgeMap[key];
+    const { length } = arcEdges;
+    for (let k = 0; k < length; k++) {
+      const current = arcEdges[k];
+      if (current.source === current.target) {
+        if (loopEdgeType) current.type = loopEdgeType;
+        // 超过8条自环边，则需要重新处理
+        current.loopCfg = {
+          position: loopPosition[k % 8],
+          dist: Math.floor(k / 8) * 20 + 50,
+        };
+        continue;
+      }
+      if (length === 1 && singleEdgeType && (current.source !== current.target || current.sourceAnchor !== current.targetAnchor)) {
+        current.type = singleEdgeType;
+        continue;
+      }
+      current.type = multiEdgeType;
+      const sign =
+        (k % 2 === 0 ? 1 : -1) * (reverses[`${current.source}|${current.sourceAnchor}|${current.target}|${current.targetAnchor}|${k}`] ? -1 : 1);
+      if (length % 2 === 1) {
+        current.curveOffset = sign * Math.ceil(k / 2) * cod;
+      } else {
+        current.curveOffset = sign * (Math.floor(k / 2) * cod + offsetDiff);
+      }
+    }
+  }
+  return edges;
 };
 
 // 实际接入后端后，改为在init时进行处理
@@ -247,11 +242,10 @@ function saveAddClass() {
     category: 2
   })
   console.log(classes)
-
-  categories.value.find(item => item.categoryName=="自定义类").models.push({
-    class_name: addClassForm.value.className, 
-    description: `矩形-${addClassForm.value.inParams.length}-${addClassForm.value.outParams.length}`, 
-    color: "#00D7FF" 
+  categories.value.find(item => item.categoryName == "自定义类").models.push({
+    class_name: addClassForm.value.className,
+    description: `矩形-${addClassForm.value.inParams.length}-${addClassForm.value.outParams.length}-(${addClassForm.value.className})`,
+    color: "#00D7FF"
   })
 
   addClassDialogVisible.value = false
@@ -261,25 +255,23 @@ function saveAddClass() {
 }
 
 onMounted(() => {
-    initGraph()
-    initMenu()
-    setupDragEvents()
+  initGraph()
+  initMenu()
+  setupDragEvents()
 })
 
-function hideAnchorPointsVisibility(item)
-{
-    const anchorPoints = item.getContainer().findAll(ele => ele.get('name') === 'anchor-point');
-    anchorPoints.forEach(point => {
-        point.attr({opacity:0.5})
-    })
+function hideAnchorPointsVisibility(item) {
+  const anchorPoints = item.getContainer().findAll(ele => ele.get('name') === 'anchor-point');
+  anchorPoints.forEach(point => {
+    point.attr({ opacity: 0.5 })
+  })
 }
 
-function showAnchorPointsVisibility(item)
-{
-    const anchorPoints = item.getContainer().findAll(ele => ele.get('name') === 'anchor-point');
-    anchorPoints.forEach(point => {
-        point.attr({opacity:1})
-    })
+function showAnchorPointsVisibility(item) {
+  const anchorPoints = item.getContainer().findAll(ele => ele.get('name') === 'anchor-point');
+  anchorPoints.forEach(point => {
+    point.attr({ opacity: 1 })
+  })
 }
 
 function getRectAnchors(inNum, outNum) {
@@ -299,15 +291,15 @@ function getRectAnchors(inNum, outNum) {
 function register(inNum, outNum, inPar, outPar) {
   count++;
   registeredNodes.value.push({
-    input_num: inNum, 
-    output_num: outNum, 
-    input_params: inPar, 
+    input_num: inNum,
+    output_num: outNum,
+    input_params: inPar,
     output_params: outPar
   })
   let newName = `rect-node-${inNum}-${outNum}`
-  G6.registerNode(newName,{
+  G6.registerNode(newName, {
     getAnchorPoints(cfg) {
-      return cfg.anchorPoints || getRectAnchors(inNum,outNum);
+      return cfg.anchorPoints || getRectAnchors(inNum, outNum);
       // return cfg.anchorPoints || [[0, 0.2], [0, 0.4], [0, 0.6], [0, 0.8], [1, 0.25], [1, 0.5], [1, 0.75]];
     },
     // draw anchor-point circles according to the anchorPoints in afterDraw
@@ -315,43 +307,43 @@ function register(inNum, outNum, inPar, outPar) {
       const bbox = group.getBBox();
       const anchorPoints = this.getAnchorPoints(cfg)
       anchorPoints.forEach((anchorPos, i) => {
-          const isEntryPoint = i < inNum;
-          group.addShape('circle', {
-              attrs: {
-                  r: 5,
-                  x: bbox.x + bbox.width * anchorPos[0],
-                  y: bbox.y + bbox.height * anchorPos[1],
-                  fill: '#fff',
-                  stroke: '#5F95FF',
-                  opacity: 0
-              },
-              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-              name: `anchor-point`, // the name, for searching by group.find(ele => ele.get('name') === 'anchor-point')
-              anchorPointIdx: i, // flag the idx of the anchor-point circle
-              links: 1, // cache the number of edges connected to this shape
-              visible: true, // invisible by default, shows up when links > 1 or the node is in showAnchors state
-              draggable: true, // allow to catch the drag events on this shape
-              pointType: isEntryPoint ? 'entry' : 'exit', // 入点或出点
-              parType: isEntryPoint ? inPar[i].type : outPar[i-inNum].type,
-              parName: isEntryPoint ? inPar[i].name : outPar[i-inNum].name,
-              parTag: isEntryPoint ? inPar[i].tag : outPar[i-inNum].tag,
-              available: true
-          })
+        const isEntryPoint = i < inNum;
+        group.addShape('circle', {
+          attrs: {
+            r: 5,
+            x: bbox.x + bbox.width * anchorPos[0],
+            y: bbox.y + bbox.height * anchorPos[1],
+            fill: '#fff',
+            stroke: '#5F95FF',
+            opacity: 0
+          },
+          // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
+          name: `anchor-point`, // the name, for searching by group.find(ele => ele.get('name') === 'anchor-point')
+          anchorPointIdx: i, // flag the idx of the anchor-point circle
+          links: 1, // cache the number of edges connected to this shape
+          visible: true, // invisible by default, shows up when links > 1 or the node is in showAnchors state
+          draggable: true, // allow to catch the drag events on this shape
+          pointType: isEntryPoint ? 'entry' : 'exit', // 入点或出点
+          parType: isEntryPoint ? inPar[i].type : outPar[i - inNum].type,
+          parName: isEntryPoint ? inPar[i].name : outPar[i - inNum].name,
+          parTag: isEntryPoint ? inPar[i].tag : outPar[i - inNum].tag,
+          available: true
+        })
       })
     },
 
     // response the state changes and show/hide the link-point circles
     setState(name, value, item) {
       if (name === 'showAnchors') {
-          const anchorPoints = item.getContainer().findAll(ele => ele.get('name') === 'anchor-point');
-          anchorPoints.forEach(point => {
-              if (value || point.get('links') > 0) point.show()
-              else point.hide()
-          })
+        const anchorPoints = item.getContainer().findAll(ele => ele.get('name') === 'anchor-point');
+        anchorPoints.forEach(point => {
+          if (value || point.get('links') > 0) point.show()
+          else point.hide()
+        })
       }
     }
   }, 'rect')
-  console.log("register node:",newName)
+  console.log("register node:", newName)
   return newName
 }
 
@@ -363,8 +355,8 @@ function initTooltip() {
       const outDiv = document.createElement('div')
       outDiv.style.width = '180px'
       let type = e.item.getType();
-      if(type == 'node') {
-        if(e.target.get('name') == 'anchor-point') {
+      if (type == 'node') {
+        if (e.target.get('name') == 'anchor-point') {
           outDiv.innerHTML = `
           <h4>Anchor Point</h4>
           <ul><li>Name: ${e.target.get('parName')}</li></ul>
@@ -372,7 +364,7 @@ function initTooltip() {
           <ul><li>Tag: ${e.target.get('parTag')}</li></ul>
           `
           return outDiv
-        } 
+        }
         else {
           outDiv.innerHTML = `
           <h4>Node</h4>
@@ -381,13 +373,13 @@ function initTooltip() {
           `
           return outDiv
         }
-      } 
-      else if(type == 'edge') {
-        let sourceClassName = nodes.value.find(ele => ele.id==e.item.getSource().getID()).className;
-        let targetClassName = nodes.value.find(ele => ele.id==e.item.getTarget().getID()).className;
+      }
+      else if (type == 'edge') {
+        let sourceClassName = nodes.value.find(ele => ele.id == e.item.getSource().getID()).className;
+        let targetClassName = nodes.value.find(ele => ele.id == e.item.getTarget().getID()).className;
         let sourceClass = classes.find(item => item.class_name == sourceClassName);
         let targetClass = classes.find(item => item.class_name == targetClassName);
-        let sourceAP = sourceClass.output_params[e.item.getModel().sourceAnchor-sourceClass.input_num]
+        let sourceAP = sourceClass.output_params[e.item.getModel().sourceAnchor - sourceClass.input_num]
         let targetAP = targetClass.input_params[e.item.getModel().targetAnchor]
         outDiv.innerHTML = `
         <h4>Edge</h4>
@@ -407,7 +399,7 @@ function initTooltip() {
         return outDiv
       }
     },
-    itemTypes: ['node','edge']
+    itemTypes: ['node', 'edge']
   })
   return tooltip
 }
@@ -421,51 +413,50 @@ function handleUpdate(updatedItem) {
   updateGraph(); // 调用更新图表的方法
 }
 
-function initMenu()
-{
-    const menu = new G6.Menu({
-        getContent(evt) {
-        let header;
-        if (evt.target && evt.target.isCanvas && evt.target.isCanvas()) {
-          header = 'Canvas ContextMenu';
-        } else if (evt.item) {
-          const itemType = evt.item.getType();
-          header = `${itemType.toUpperCase()} ContextMenu`;
-        }
-        const outDiv = document.createElement('div');
-        outDiv.style.cursor = 'pointer'
-        outDiv.innerHTML = '<p id="deleteNode">删除</p>'
-        console.log(outDiv)
-        // let btn = outDiv.querySelector('#deleteNode')
-        // console.log(btn)
-        // btn.addEventListener('click', test)
-        // return `
-        // <h3>${header}</h3>
-        // <ul>
-        //   <li title='1'>li 1</li>
-        //   <li title='2'>li 2</li>
-        //   <li>li 3</li>
-        //   <li>li 4</li>
-        //   <li>li 5</li>
-        // </ul>`;
-        return outDiv
-        },
-        handleMenuClick: (target, item) => {
-          console.log(target, item);
-          graph.value.removeItem(item);
-          edges.value = graph.value.save().edges
-          nodes.value = graph.value.save().nodes
-        },
-        // offsetX and offsetY include the padding of the parent container
-        // 需要加上父级容器的 padding-left 16 与自身偏移量 10
-        offsetX: 16 + 10,
-        // 需要加上父级容器的 padding-top 24 、画布兄弟元素高度、与自身偏移量 10
-        offsetY: 0,
-        // the types of items that allow the menu show up
-        // 在哪些类型的元素上响应
-        itemTypes: ['node', 'edge'],
-    })
-    return menu;
+function initMenu() {
+  const menu = new G6.Menu({
+    getContent(evt) {
+      let header;
+      if (evt.target && evt.target.isCanvas && evt.target.isCanvas()) {
+        header = 'Canvas ContextMenu';
+      } else if (evt.item) {
+        const itemType = evt.item.getType();
+        header = `${itemType.toUpperCase()} ContextMenu`;
+      }
+      const outDiv = document.createElement('div');
+      outDiv.style.cursor = 'pointer'
+      outDiv.innerHTML = '<p id="deleteNode">删除</p>'
+      console.log(outDiv)
+      // let btn = outDiv.querySelector('#deleteNode')
+      // console.log(btn)
+      // btn.addEventListener('click', test)
+      // return `
+      // <h3>${header}</h3>
+      // <ul>
+      //   <li title='1'>li 1</li>
+      //   <li title='2'>li 2</li>
+      //   <li>li 3</li>
+      //   <li>li 4</li>
+      //   <li>li 5</li>
+      // </ul>`;
+      return outDiv
+    },
+    handleMenuClick: (target, item) => {
+      console.log(target, item);
+      graph.value.removeItem(item);
+      edges.value = graph.value.save().edges
+      nodes.value = graph.value.save().nodes
+    },
+    // offsetX and offsetY include the padding of the parent container
+    // 需要加上父级容器的 padding-left 16 与自身偏移量 10
+    offsetX: 16 + 10,
+    // 需要加上父级容器的 padding-top 24 、画布兄弟元素高度、与自身偏移量 10
+    offsetY: 0,
+    // the types of items that allow the menu show up
+    // 在哪些类型的元素上响应
+    itemTypes: ['node', 'edge'],
+  })
+  return menu;
 }
 
 function initGraph() {
@@ -475,60 +466,60 @@ function initGraph() {
     container: 'container',
     width: 800,
     height: 600,
-    plugins:[menu,tooltip],
+    plugins: [menu, tooltip],
     modes: {
       default: [
-      'drag-canvas',
-      'zoom-canvas', 
-      // config the shouldBegin for drag-node to avoid node moving while dragging on the anchor-point circles
-      {
+        'drag-canvas',
+        'zoom-canvas',
+        // config the shouldBegin for drag-node to avoid node moving while dragging on the anchor-point circles
+        {
           type: 'drag-node',
           shouldBegin: e => {
-              if (e.target.get('name') === 'anchor-point') return false;
-              return true;
+            if (e.target.get('name') === 'anchor-point') return false;
+            return true;
           }
-      },
-      // config the shouldBegin and shouldEnd to make sure the create-edge is began and ended at anchor-point circles
-      {
+        },
+        // config the shouldBegin and shouldEnd to make sure the create-edge is began and ended at anchor-point circles
+        {
           type: 'create-edge',
           trigger: 'drag', // set the trigger to be drag to make the create-edge triggered by drag
           shouldBegin: e => {
-              // avoid beginning at other shapes on the node
-              if (e.target && e.target.get('name') !== 'anchor-point') return false;
-              sourceAnchorIdx = e.target.get('anchorPointIdx');
-              if (e.target.get('pointType') != 'exit') return false;
-              curVarType = e.target.get('parType');
-              e.target.set('links', e.target.get('links') + 1); // cache the number of edge connected to this anchor-point circle
-              return true;
+            // avoid beginning at other shapes on the node
+            if (e.target && e.target.get('name') !== 'anchor-point') return false;
+            sourceAnchorIdx = e.target.get('anchorPointIdx');
+            if (e.target.get('pointType') != 'exit') return false;
+            curVarType = e.target.get('parType');
+            e.target.set('links', e.target.get('links') + 1); // cache the number of edge connected to this anchor-point circle
+            return true;
           },
           shouldEnd: e => {
-              // avoid ending at other shapes on the node
-              if (e.target && e.target.get('name') !== 'anchor-point') return false;
-              if (e.target.get('pointType') != 'entry') return false;
-              if (e.target.get('available') == false) {
-                alert("已经……被塞满了……")
-                return false;
-              }
-              if (e.target.get('parType') != curVarType) {
-                alert(`出点的类型为: ${curVarType}，入点的类型为: ${e.target.get('parType')}，二者类型不同，不能相互连接。`);
-                curVarType = '';
-                return false;
-              }
-              if (e.target) {
-                  targetAnchorIdx = e.target.get('anchorPointIdx');
-                  e.target.set('links', e.target.get('links') + 1);  // cache the number of edge connected to this anchor-point circle
-                  e.target.set('available', false);
-                  return true;
-              }
-
-              targetAnchorIdx = undefined;
+            // avoid ending at other shapes on the node
+            if (e.target && e.target.get('name') !== 'anchor-point') return false;
+            if (e.target.get('pointType') != 'entry') return false;
+            if (e.target.get('available') == false) {
+              alert("已经……被塞满了……")
+              return false;
+            }
+            if (e.target.get('parType') != curVarType) {
+              alert(`出点的类型为: ${curVarType}，入点的类型为: ${e.target.get('parType')}，二者类型不同，不能相互连接。`);
+              curVarType = '';
+              return false;
+            }
+            if (e.target) {
+              targetAnchorIdx = e.target.get('anchorPointIdx');
+              e.target.set('links', e.target.get('links') + 1);  // cache the number of edge connected to this anchor-point circle
+              e.target.set('available', false);
               return true;
+            }
+
+            targetAnchorIdx = undefined;
+            return true;
           },
-      }],
+        }],
     },
     defaultNode: {
       type: 'rect-node',
-      size: [60,100],
+      size: [60, 100],
       style: {
         fill: '#9EC9FF',
         stroke: '#5B8FF9',
@@ -554,35 +545,35 @@ function initGraph() {
   // graph.value.on('node:click', onNodeClick);
 
   graph.value.on('aftercreateedge', (e) => {
-      // count++;
-      // update the sourceAnchor and targetAnchor for the newly added edge
-      graph.value.updateItem(e.edge, {
-          sourceAnchor: sourceAnchorIdx,
-          targetAnchor: targetAnchorIdx
-      })
+    // count++;
+    // update the sourceAnchor and targetAnchor for the newly added edge
+    graph.value.updateItem(e.edge, {
+      sourceAnchor: sourceAnchorIdx,
+      targetAnchor: targetAnchorIdx
+    })
 
-      // update the curveOffset for parallel edges
-      const tempEdges = graph.value.save().edges;
-      edges.value = tempEdges
-      processParallelEdgesOnAnchorPoint(tempEdges);
-      graph.value.getEdges().forEach((edge, i) => {
-          graph.value.updateItem(edge, {
-              curveOffset: tempEdges[i].curveOffset,
-              curvePosition: tempEdges[i].curvePosition,
-          });
+    // update the curveOffset for parallel edges
+    const tempEdges = graph.value.save().edges;
+    edges.value = tempEdges
+    processParallelEdgesOnAnchorPoint(tempEdges);
+    graph.value.getEdges().forEach((edge, i) => {
+      graph.value.updateItem(edge, {
+        curveOffset: tempEdges[i].curveOffset,
+        curvePosition: tempEdges[i].curvePosition,
       });
-      
+    });
+
   });
   // // after drag from the first node, the edge is created, update the sourceAnchor
   graph.value.on('afteradditem', (e) => {
     if (e.item && e.item.getType() === 'edge' && sourceAnchorIdx != null) {
       graph.value.updateItem(e.item, {
-          sourceAnchor: sourceAnchorIdx
+        sourceAnchor: sourceAnchorIdx
       });
     }
     if (e.item && e.item.getType() === 'edge') {
       let targetNode = graph.value.findById(e.item.get("target").getID())
-      let anchor=(targetNode.getContainer().findAll(ele => ele.get('name') === 'anchor-point'))[e.item.get("model").targetAnchor]
+      let anchor = (targetNode.getContainer().findAll(ele => ele.get('name') === 'anchor-point'))[e.item.get("model").targetAnchor]
       if (anchor)
         anchor.set('available', false)
     }
@@ -595,14 +586,14 @@ function initGraph() {
       const targetNode = graph.value.findById(e.item.target);
       const { sourceAnchor, targetAnchor } = e.item;
       if (sourceNode && !isNaN(sourceAnchor)) {
-          const sourceAnchorShape = sourceNode.getContainer().find(ele => (ele.get('name') === 'anchor-point' && ele.get('anchorPointIdx') === sourceAnchor));
-          sourceAnchorShape.set('links', sourceAnchorShape.get('links') - 1);
+        const sourceAnchorShape = sourceNode.getContainer().find(ele => (ele.get('name') === 'anchor-point' && ele.get('anchorPointIdx') === sourceAnchor));
+        sourceAnchorShape.set('links', sourceAnchorShape.get('links') - 1);
       }
       if (targetNode && !isNaN(targetAnchor)) {
-          const targetAnchorShape = targetNode.getContainer().find(ele => (ele.get('name') === 'anchor-point' && ele.get('anchorPointIdx') === targetAnchor));
-          targetAnchorShape.set('links', targetAnchorShape.get('links') - 1);
-          let anchor=(targetNode.getContainer().findAll(ele => ele.get('name') === 'anchor-point'))[e.item.targetAnchor]
-          anchor.set('available', true)
+        const targetAnchorShape = targetNode.getContainer().find(ele => (ele.get('name') === 'anchor-point' && ele.get('anchorPointIdx') === targetAnchor));
+        targetAnchorShape.set('links', targetAnchorShape.get('links') - 1);
+        let anchor = (targetNode.getContainer().findAll(ele => ele.get('name') === 'anchor-point'))[e.item.targetAnchor]
+        anchor.set('available', true)
       }
     }
   })
@@ -610,14 +601,12 @@ function initGraph() {
   // 节点双击事件
   graph.value.on('dblclick', e => {
     console.log(e.item)
-    if(e.item && e.item.getType() !== 'edge')
-    {
+    if (e.item && e.item.getType() !== 'edge') {
       selectedItem.value = e.item._cfg.model
       // selectedItem.value.className = "123123"
       console.log(e.item._cfg.model)
     }
-    else
-    {
+    else {
       selectedItem.value = null;
     }
   })
@@ -634,7 +623,7 @@ function initGraph() {
   graph.value.on('node:mouseout', e => {
     // mouseout不符合预期，暂时不考虑触发隐藏锚点
     // hideAnchorPointsVisibility(e.item)
-  }) 
+  })
   graph.value.on('node:dragenter', e => {
     // graph.value.setItemState(e.item, 'showAnchors', true);
     hideAnchorPointsVisibility(e.item)
@@ -752,21 +741,22 @@ function loadGraph(event) {
       console.log("Load:", file)
       count = 0
       classes = data.classesData
+      categories.value.find(item => item.categoryName == "自定义类").models.length = 0
       classes.forEach(cla => {
         if (cla.category == 2) {
-          categories.value.find(item => item.categoryName=="自定义类").models.push({
-            class_name: cla.class_name, 
-            description: `矩形-${cla.input_num}-${cla.output_num}`, 
-            color: "#00D7FF" 
+          categories.value.find(item => item.categoryName == "自定义类").models.push({
+            class_name: cla.class_name,
+            description: `矩形-${cla.input_num}-${cla.output_num}-(${cla.class_name})`,
+            color: "#00D7FF"
           })
         }
       })
 
       let registered = data.registerData
       registered.forEach(node => {
-        register(node.input_num,node.output_num,node.input_params,node.output_params)
+        register(node.input_num, node.output_num, node.input_params, node.output_params)
       })
-      
+
       edges.value = data.graphData.edges
       nodes.value = data.graphData.nodes
       updateGraph()
@@ -784,15 +774,16 @@ function loadGraph(event) {
 
 <style scoped>
 .model {
-  width: 120px; 
+  width: 120px;
   height: 40px;
   cursor: grab;
-  margin-bottom:5px;
-  display:flex;
-  border-radius:10%;
+  margin-bottom: 5px;
+  display: flex;
+  border-radius: 10%;
   justify-content: center;
   align-items: center;
 }
+
 .g6-component-tooltip {
   background-color: rgba(255, 255, 255, 0.8);
   padding: 0px 10px 24px 10px;
