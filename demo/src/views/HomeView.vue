@@ -729,6 +729,7 @@ function saveGraph() {
   // 清理 URL 对象
   URL.revokeObjectURL(url);
   document.body.removeChild(link);
+  console.log('save')
 }
 
 function loadGraph(event) {
