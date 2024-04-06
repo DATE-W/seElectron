@@ -34,7 +34,8 @@
           "tag": "e is int"
         }
       ],
-      "category": 0
+      "category": 0,
+      "dependencies": []
     },
     {
       "class_name": "B",
@@ -80,7 +81,12 @@
           "tag": "g is boolean"
         }
       ],
-      "category": 0
+      "category": 0,
+      "dependencies": [
+        "A",
+        "C",
+        "D"
+      ]
     },
     {
       "class_name": "C",
@@ -121,7 +127,11 @@
           "tag": "f is string"
         }
       ],
-      "category": 1
+      "category": 1,
+      "dependencies": [
+        "A",
+        "D"
+      ]
     },
     {
       "class_name": "D",
@@ -152,7 +162,10 @@
           "tag": "d is int"
         }
       ],
-      "category": 1
+      "category": 1,
+      "dependencies": [
+        "A"
+      ]
     }
   ]
 }

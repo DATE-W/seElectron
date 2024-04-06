@@ -49,6 +49,18 @@
               </el-row>
               <el-button @click="addClassOutParam('output')">新增出参</el-button>
             </el-form-item>
+            <el-form-item label="本地依赖">
+              <el-upload ref="upload" multiple :on-change="handleFileSelection" :before-upload="() => false"
+                :show-file-list="false">
+                <el-button slot="trigger" size="small" type="primary">选择文件</el-button>
+                <div v-if="addClassForm.localDependencies.length > 0">
+                  已选择文件:
+                  <ul>
+                    <li v-for="(file, index) in addClassForm.localDependencies" :key="index">{{ file.name }}</li>
+                  </ul>
+                </div>
+              </el-upload>
+            </el-form-item>
           </el-form>
           <span slot="footer" class="dialog-footer">
             <el-button type="primary" @click="saveAddClass">保 存</el-button>
@@ -211,7 +223,8 @@ let addClassForm = ref({
   className: '',
   code: '',
   inParams: [],
-  outParams: []
+  outParams: [],
+  localDependencies: []
 })
 
 function addClassInParam() {
@@ -230,8 +243,17 @@ function removeClassOutParam(index) {
   addClassForm.value.outParams.splice(index, 1);
 }
 
+// 处理文件选择的函数
+const handleFileSelection = (file, fileList) => {
+  // 使用 Element UI el-upload 组件时，fileList 参数包含了所有选中的文件
+  // 这里我们将 fileList 直接赋值给 localDependencies，存储选中的文件信息
+  addClassForm.value.localDependencies = [...fileList];
+};
+
+
+// 保存添加的类的函数
 function saveAddClass() {
-  console.log("Save Added Class")
+  console.log("保存添加的类");
   classes.push({
     class_name: addClassForm.value.className,
     code: addClassForm.value.code,
@@ -239,19 +261,21 @@ function saveAddClass() {
     output_num: addClassForm.value.outParams.length,
     input_params: addClassForm.value.inParams,
     output_params: addClassForm.value.outParams,
-    category: 2
-  })
-  console.log(classes)
+    local_dependencies: addClassForm.value.localDependencies, // 包含本地依赖
+    category: 2,
+  });
+  console.log(classes);
   categories.value.find(item => item.categoryName == "自定义类").models.push({
     class_name: addClassForm.value.className,
     description: `矩形-${addClassForm.value.inParams.length}-${addClassForm.value.outParams.length}-(${addClassForm.value.className})`,
     color: "#00D7FF"
-  })
+  });
 
-  addClassDialogVisible.value = false
-  addClassForm.value.className = ''
-  addClassForm.value.inParams = []
-  addClassForm.value.outParams = []
+  addClassDialogVisible.value = false;
+  addClassForm.value.className = '';
+  addClassForm.value.inParams = [];
+  addClassForm.value.outParams = [];
+  addClassForm.value.localDependencies = []; // 重置本地依赖
 }
 
 onMounted(() => {
