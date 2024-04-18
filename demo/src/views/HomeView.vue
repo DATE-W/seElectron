@@ -74,8 +74,9 @@
   </div>
   <div>
     <button @click="saveGraph">SAVE</button>
+    <!-- <button id="ld" style="display:none" @click="trigger"></button> -->
     <!-- <button @click="loadGraph">LOAD</button> -->
-    <input type="file" ref="fileInput" @change="loadGraph">
+    <input id="LdGf" type="file" ref="fileInput" @change="loadGraph">
   </div>
   <div v-show="selectedItem" v-if="selectedItem">
     <attrWindow id="attrWindow1" style="width:500px" :item="selectedItem" @update="handleUpdate" />
@@ -85,7 +86,19 @@
 <script setup name="GraphEditor">
 import G6 from '@antv/g6';
 import { ref, onMounted } from 'vue'
+// import { readFile } from 'original-fs';
 // import attrWindow from '@/components/attrWindow.vue';
+
+window.electronAPI.onSaveGraph((value)=>{
+  saveGraph()
+})
+
+window.electronAPI.onLoadGraph(async (value)=>{
+  const dt = await window.electronAPI.openFile()
+  const data = JSON.parse(dt)
+  loadGraphFromData(data)
+  // console.log(filePath)
+})
 
 // display
 const selectedItem = ref(null)
@@ -791,6 +804,36 @@ function loadGraph(event) {
   };
 
   reader.readAsText(file); // 以文本形式读取文件内容
+}
+
+function loadGraphFromData(data) {
+
+  try {
+    count = 0
+    classes = data.classesData
+    categories.value.find(item => item.categoryName == "自定义类").models.length = 0
+    classes.forEach(cla => {
+      if (cla.category == 2) {
+        categories.value.find(item => item.categoryName == "自定义类").models.push({
+          class_name: cla.class_name,
+          description: `矩形-${cla.input_num}-${cla.output_num}-(${cla.class_name})`,
+          color: "#00D7FF"
+        })
+      }
+    })
+
+    let registered = data.registerData
+    registered.forEach(node => {
+      register(node.input_num, node.output_num, node.input_params, node.output_params)
+    })
+
+    edges.value = data.graphData.edges
+    nodes.value = data.graphData.nodes
+    updateGraph()
+  } 
+  catch (error) {
+    console.error(error);
+  }
 }
 
 </script>

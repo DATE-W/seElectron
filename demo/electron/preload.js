@@ -1,10 +1,21 @@
+const { contextBridge, ipcRenderer, dialog } = require('electron')
+
 window.addEventListener('DOMContentLoaded', () => {
-    const replaceText = (selector, text) => {
-      const element = document.getElementById(selector)
-      if (element) element.innerText = text
-    }
-  
-    for (const dependency of ['chrome', 'node', 'electron']) {
-      replaceText(`${dependency}-version`, process.versions[dependency])
-    }
-  })
+  const replaceText = (selector, text) => {
+    const element = document.getElementById(selector)
+    if (element) element.innerText = text
+  }
+
+  for (const dependency of ['chrome', 'node', 'electron']) {
+    replaceText(`${dependency}-version`, process.versions[dependency])
+  }
+})
+
+window.ipcRenderer = require('electron').ipcRenderer
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  // onUpdateCounter: (callback) => ipcRenderer.on('update-counter', (_event, value) => callback(value))
+  onSaveGraph: (callback) => ipcRenderer.on('SaveGraph', (_event, value) => callback(value)),
+  onLoadGraph: (callback) => ipcRenderer.on('LoadGraph', (_event, value) => callback(value)),
+  openFile: () => ipcRenderer.invoke('dialog:openFile')
+})
