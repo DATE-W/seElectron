@@ -1,11 +1,11 @@
 <template>
-    <div style="margin-bottom:20px;">
+    <!-- <div style="margin-bottom:20px;">
         <el-input-number v-model="scaler" :step="10" min="20" max="200" @change="scale" />
-    </div>
+    </div> -->
     <div style="width:auto">
         <div style="display:flex;">
             <div id="shape-selector"
-                style="width: 200px; height: 600px; border: 1px solid #ccc; padding: 10px; display:block; flex-direction:column; justify-items:center; align-items:center">
+                style="width: 20vw; height: 90vh; border: 1px solid #ccc; padding: 0; display:block; flex-direction:column; justify-items:center; align-items:center">
                 <div v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
                     <h3>{{ category.categoryName }}</h3>
                     <div v-for="model in category.models" :key="model.class_name" class="drag-node model"
@@ -75,19 +75,19 @@
                     </el-dialog>
                 </div>
             </div>
+            <div  class="parent-canvas" ref="parent-canvas">
+                <div id="container" ref="container"></div>
+            </div>
 
-            <div id="container" style="flex-grow: 1; height: 600px; border: 1px solid #ccc;"></div>
         </div>
     </div>
-    <div>
+    <!-- <div>
         <button @click="saveGraph">SAVE</button>
-        <!-- <button id="ld" style="display:none" @click="trigger"></button> -->
-        <!-- <button @click="loadGraph">LOAD</button> -->
         <input id="LdGf" type="file" ref="fileInput" @change="loadGraph">
     </div>
     <div v-show="selectedItem" v-if="selectedItem">
         <attrWindow id="attrWindow1" style="width:500px" :item="selectedItem" @update="handleUpdate" />
-    </div>
+    </div> -->
 </template>
 
 <script setup name="GraphEditor">
@@ -514,13 +514,18 @@ function initMenu() {
     return menu;
 }
 
+let canvas_width = ref(0);
+let canvas_height = ref(0);
+
 function initGraph() {
     const tooltip = initTooltip()
     const menu = initMenu()
+    // this.canvas_width = this.$refs.parent-canvas.ClientWidth;
+    // this.canvas_height = this.$refs.parent-canvas.ClientHeight;
     graph.value = new G6.Graph({
         container: 'container',
-        width: 800,
-        height: 600,
+        width: this.canvas_width,
+        height: this.canvas_height,
         plugins: [menu, tooltip],
         modes: {
             default: [
@@ -875,5 +880,13 @@ function loadGraphFromData(data) {
     background-color: rgba(255, 255, 255, 0.8);
     padding: 0px 10px 24px 10px;
     box-shadow: rgb(174, 174, 174) 0px 0px 10px;
+}
+
+.parent-canvas {
+    min-width: 80vw; 
+    flex-grow: 1;
+    min-height: 90vh;
+    border: 1px
+    solid #ccc;
 }
 </style>
