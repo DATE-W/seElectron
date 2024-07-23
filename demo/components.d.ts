@@ -18,6 +18,7 @@ declare module 'vue' {
     ElInput: typeof import('element-plus/es')['ElInput']
     ElRow: typeof import('element-plus/es')['ElRow']
     ElUpload: typeof import('element-plus/es')['ElUpload']
+    FunctionButtonBox: typeof import('./src/components/FunctionButtonBox.vue')['default']
     Graph: typeof import('./src/components/Graph.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
