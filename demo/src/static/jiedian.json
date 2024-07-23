@@ -1,0 +1,48 @@
+{
+    "jiedian": [
+        {
+            "nodeName": "1",
+            "nodeID": 1,
+            "driveMode": "RFM",
+            "runMode": "realtime",
+            "isMainNode": "true",
+            "timeSource": "OS",
+            "mainStep": 1.0,
+            "simStep": 1.0,
+            "maxModelNumber": 100
+        },
+        {
+            "nodeName": "2",
+            "nodeID": 2,
+            "driveMode": "RFM",
+            "runMode": "freeRun",
+            "isMainNode": "false",
+            "timeSource": "hardware",
+            "mainStep": 1.0,
+            "simStep": 1.0,
+            "maxModelNumber": 100
+        },
+        {
+            "nodeName": "3",
+            "nodeID": 3,
+            "driveMode": "RFM",
+            "runMode": "realtime",
+            "isMainNode": "false",
+            "timeSource": "OS",
+            "mainStep": 1.0,
+            "simStep": 1.0,
+            "maxModelNumber": 100
+        },
+        {
+            "nodeName": "4",
+            "nodeID": 4,
+            "driveMode": "RFM",
+            "runMode": "realtime",
+            "isMainNode": "false",
+            "timeSource": "OS",
+            "mainStep": 1.0,
+            "simStep": 1.0,
+            "maxModelNumber": 100
+        }
+    ]
+}

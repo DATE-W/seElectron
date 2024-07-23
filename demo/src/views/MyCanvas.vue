@@ -21,7 +21,7 @@
                             <span style="padding-left:20px">{{ category.categoryName }}</span>
                         </template>
                         <div v-for="model in category.models" :key="model.class_name" class="drag-node model"
-                            draggable="true" @dragstart="onDragStart($event, model.class_name)"
+                            draggable="true" @dragstart="onDragStart($event, model.class_name, category.categoryName)"
                             :style="{ backgroundColor: model.color }">
                             {{ model.description }}
                         </div>
@@ -274,8 +274,10 @@ let registeredNodes = ref([])
 // const menu = ref(null)
 
 import classesData from '@/static/classes.json'
+import jiedianData from '@/static/jiedian.json'
 
 let classes = classesData.classes
+let jiedian = jiedianData.jiedian
 
 let curVarType = ref('')
 let isDragging = ref(false)
@@ -750,10 +752,19 @@ function initGraph() {
     updateGraph();
 }
 
-function onDragStart(event, className) {
-    let dragClass = classes.find(item => item.class_name == className);
-    event.dataTransfer.setData('className', dragClass.class_name)
-    // console.log("Drag Class: ", dragClass.class_name)
+function onDragStart(event, className, categoryName) {
+    console.log("Drag: ", className, categoryName)
+
+    event.dataTransfer.setData('categoryName', categoryName)
+    let dragClass = null
+    if (categoryName == "节点") {
+        dragClass = jiedian.find(item => item.nodeName == className)
+        event.dataTransfer.setData('className', dragClass.nodeName)
+    }
+    else {
+        dragClass = classes.find(item => item.class_name == className)
+        event.dataTransfer.setData('className', dragClass.class_name)
+    }   
 }
 
 function setupDragEvents() {
@@ -769,32 +780,42 @@ function setupDragEvents() {
         //     console.log(point)
         //     point.attr({opacity:0})
         // })
-        console.log("cececes")
-        event.preventDefault();
-        let className = event.dataTransfer.getData('className');
-        let dragClass = classes.find(item => item.class_name == className);
-        let inNum = dragClass.input_num;
-        let outNum = dragClass.output_num;
-        let inPar = dragClass.input_params;
-        let outPar = dragClass.output_params;
-        let text = dragClass.code;
-        event.dataTransfer.clearData();
-        let nodeType = register(inNum, outNum, inPar, outPar);
-        // console.log(categories.value)
-        if (nodeType) {
-            const model = {
-                id: `${nodeType}-${count}`,
-                className: className,
-                x: event.offsetX,
-                y: event.offsetY,
-                label: `${text}`,
-                type: nodeType,
-                style: {
-                    "fill": categories.value[dragClass.category].models[0].color
-                }
-            };
-            nodes.value.push(model); // Add node to nodes array
-            updateGraph(); // Re-render the graph
+        console.log("drag data transfer")
+        let categoryName = event.dataTransfer.getData('categoryName')
+        if (categoryName == "节点"){
+            event.preventDefault();
+            let className = event.dataTransfer.getData('className')
+            let dragClass = jiedian.find(item => item.nodeName == className)
+            console.log("add 节点:", dragClass)
+        }
+        else {
+            // 模型
+            event.preventDefault();
+            let className = event.dataTransfer.getData('className');
+            let dragClass = classes.find(item => item.class_name == className);
+            let inNum = dragClass.input_num;
+            let outNum = dragClass.output_num;
+            let inPar = dragClass.input_params;
+            let outPar = dragClass.output_params;
+            let text = dragClass.code;
+            event.dataTransfer.clearData();
+            let nodeType = register(inNum, outNum, inPar, outPar);
+            // console.log(categories.value)
+            if (nodeType) {
+                const model = {
+                    id: `${nodeType}-${count}`,
+                    className: className,
+                    x: event.offsetX,
+                    y: event.offsetY,
+                    label: `${text}`,
+                    type: nodeType,
+                    style: {
+                        "fill": categories.value[dragClass.category].models[0].color
+                    }
+                };
+                nodes.value.push(model); // Add node to nodes array
+                updateGraph(); // Re-render the graph
+            }
         }
     });
 }
