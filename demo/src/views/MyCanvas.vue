@@ -241,12 +241,21 @@ const processParallelEdgesOnAnchorPoint = (
 
 const categories = ref([
     {
-        categoryName: "第一类",
+        categoryName: "节点",
         models: [
-            { class_name: "A", description: "类型(A)", color: "#9EC9FF" },
-            { class_name: "B", description: "类型(B)", color: "#9EC9FF" },
-            { class_name: "C", description: "类型(C)", color: "#9EC9FF" },
-            { class_name: "D", description: "类型(D)", color: "#9EC9FF" },
+            { class_name: "1", description: "节点(1)", color: "#9EC9FF" },
+            { class_name: "2", description: "节点(2)", color: "#9EC9FF" },
+            { class_name: "3", description: "节点(3)", color: "#9EC9FF" },
+            { class_name: "4", description: "节点(4)", color: "#9EC9FF" },
+        ]
+    },
+    {
+        categoryName: "模型",
+        models: [
+            { class_name: "A", description: "模型(A)", color: "#9EC9FF" },
+            { class_name: "B", description: "模型(B)", color: "#9EC9FF" },
+            { class_name: "C", description: "模型(C)", color: "#9EC9FF" },
+            { class_name: "D", description: "模型(D)", color: "#9EC9FF" },
         ]
     },
     {
