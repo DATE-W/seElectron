@@ -4,35 +4,35 @@
     </div> -->
 
     <div style="width:auto">
-      <a-flex justify="space-between" align="flex-start">
-        <div>
-          <a-button type="text">
-            <PlusCircleOutlined />放大
-          </a-button>
+        <a-flex justify="space-between" align="flex-start">
+            <div>
+                <a-button type="text">
+                    <PlusCircleOutlined />放大
+                </a-button>
 
-          <a-divider type="vertical" style="height: auto" />
+                <a-divider type="vertical" style="height: auto" />
 
-          <a-button type="text">
-            <MinusCircleOutlined />缩小
-          </a-button>
+                <a-button type="text">
+                    <MinusCircleOutlined />缩小
+                </a-button>
 
-          <a-divider type="vertical" style="height: auto" />
+                <a-divider type="vertical" style="height: auto" />
 
-          <a-button type="text">
-            <CloudUploadOutlined />导出
-          </a-button>
-        </div>
-        <div style="margin-right: 10px">
-          <a-button type="text">
-            <UserOutlined />
-          </a-button>
-        </div>
+                <a-button type="text">
+                    <CloudUploadOutlined />导出
+                </a-button>
+            </div>
+            <div style="margin-right: 10px">
+                <a-button type="text">
+                    <UserOutlined />
+                </a-button>
+            </div>
 
-      </a-flex>
-      <div style="display:flex;">
-          <div id="shape-selector"
-              style="width: 20vw; height: 90vh; border: 1px solid #ccc; padding: 0; display:block; flex-direction:column; justify-items:center; align-items:center">
-              <!-- <div v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
+        </a-flex>
+        <div style="display:flex;">
+            <div id="shape-selector"
+                style="width: 20vw; height: 90vh; border: 1px solid #ccc; padding: 0; display:block; flex-direction:column; justify-items:center; align-items:center">
+                <!-- <div v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
                   <h3>{{ category.categoryName }}</h3>
                   <div v-for="model in category.models" :key="model.class_name" class="drag-node model"
                       draggable="true" @dragstart="onDragStart($event, model.class_name)"
@@ -40,85 +40,105 @@
                       {{ model.description }}
                   </div>
               </div> -->
-              <el-collapse>
-                  <el-collapse-item v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
-                      <!-- <h3>{{ category.categoryName }}</h3> -->
-                      <template v-slot:title>
-                          <span style="padding-left:20px">{{ category.categoryName }}</span>
-                      </template>
-                      <div v-for="model in category.models" :key="model.class_name" class="drag-node model"
-                          draggable="true" @dragstart="onDragStart($event, model.class_name, category.categoryName)"
-                          :style="{ backgroundColor: model.color }">
-                          {{ model.description }}
-                      </div>
-                  </el-collapse-item>
-              </el-collapse>
-              <div id="class-adder">
-                  <el-button @click="addClassDialogVisible = true">新增类</el-button>
-                  <el-dialog v-model="addClassDialogVisible" title="新增类">
-                      <el-form :model="addClassForm" label-width="100px">
-                          <el-form-item label="类名">
-                              <el-input v-model="addClassForm.className" placeholder="请输入类名"></el-input>
-                          </el-form-item>
-                          <el-form-item label="代码">
-                              <el-input v-model="addClassForm.code" placeholder="请输入类代码"></el-input>
-                          </el-form-item>
-                          <el-form-item label="入参信息">
-                              <el-row v-for="(param, index) in addClassForm.inParams" :key="index">
-                                  <el-col :span="8">
-                                      <el-input v-model="param.name" placeholder="名称"></el-input>
-                                  </el-col>
-                                  <el-col :span="8">
-                                      <el-input v-model="param.type" placeholder="类型"></el-input>
-                                  </el-col>
-                                  <el-col :span="8">
-                                      <el-input v-model="param.tag" placeholder="标签"></el-input>
-                                  </el-col>
-                                  <el-button plain type="danger" @click="removeClassInParam(index)">移除</el-button>
-                              </el-row>
-                              <el-button @click="addClassInParam('input')">新增入参</el-button>
-                          </el-form-item>
-                          <el-form-item label="出参信息">
-                              <el-row v-for="(param, index) in addClassForm.outParams" :key="index">
-                                  <el-col :span="8">
-                                      <el-input v-model="param.name" placeholder="名称"></el-input>
-                                  </el-col>
-                                  <el-col :span="8">
-                                      <el-input v-model="param.type" placeholder="类型"></el-input>
-                                  </el-col>
-                                  <el-col :span="8">
-                                      <el-input v-model="param.tag" placeholder="标签"></el-input>
-                                  </el-col>
-                                  <el-button plain type="danger" @click="removeClassOutParam(index)">移除</el-button>
-                              </el-row>
-                              <el-button @click="addClassOutParam('output')">新增出参</el-button>
-                          </el-form-item>
-                          <el-form-item label="本地依赖">
-                              <el-upload ref="upload" multiple :on-change="handleFileSelection"
-                                  :before-upload="() => false" :show-file-list="false">
-                                  <el-button slot="trigger" size="small" type="primary">选择文件</el-button>
-                                  <div v-if="addClassForm.localDependencies.length > 0">
-                                      已选择文件:
-                                      <ul>
-                                          <li v-for="(file, index) in addClassForm.localDependencies" :key="index">{{
-                      file.name }}</li>
-                                      </ul>
-                                  </div>
-                              </el-upload>
-                          </el-form-item>
-                      </el-form>
-                      <span slot="footer" class="dialog-footer">
-                          <el-button type="primary" @click="saveAddClass">保 存</el-button>
-                          <el-button @click="addClassDialogVisible = false">取 消</el-button>
-                      </span>
-                  </el-dialog>
-              </div>
-          </div>
-          <div class="parent-canvas" ref="parent-canvas">
-              <div id="container" ref="container"></div>
-          </div>
+                <el-collapse>
+                    <el-collapse-item v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
+                        <!-- <h3>{{ category.categoryName }}</h3> -->
+                        <template v-slot:title>
+                            <span style="padding-left:20px">{{ category.categoryName }}</span>
+                        </template>
+                        <div v-for="model in category.models" :key="model.class_name" class="drag-node model"
+                            draggable="true" @dragstart="onDragStart($event, model.class_name, model.type)"
+                            :style="{ backgroundColor: model.color }">
+                            {{ model.description }}
+                        </div>
+                    </el-collapse-item>
+                </el-collapse>
+                <div id="class-adder">
+                    <el-button @click="addClassDialogVisible = true">新增类</el-button>
+                    <el-dialog v-model="addClassDialogVisible" title="新增类">
+                        <el-form :model="addClassForm" label-width="100px">
+                            <el-form-item label="类名">
+                                <el-input v-model="addClassForm.className" placeholder="请输入类名"></el-input>
+                            </el-form-item>
+                            <el-form-item label="代码">
+                                <el-input v-model="addClassForm.code" placeholder="请输入类代码"></el-input>
+                            </el-form-item>
+                            <el-form-item label="入参信息">
+                                <el-row v-for="(param, index) in addClassForm.inParams" :key="index">
+                                    <el-col :span="8">
+                                        <el-input v-model="param.name" placeholder="名称"></el-input>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-input v-model="param.type" placeholder="类型"></el-input>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-input v-model="param.tag" placeholder="标签"></el-input>
+                                    </el-col>
+                                    <el-button plain type="danger" @click="removeClassInParam(index)">移除</el-button>
+                                </el-row>
+                                <el-button @click="addClassInParam('input')">新增入参</el-button>
+                            </el-form-item>
+                            <el-form-item label="出参信息">
+                                <el-row v-for="(param, index) in addClassForm.outParams" :key="index">
+                                    <el-col :span="8">
+                                        <el-input v-model="param.name" placeholder="名称"></el-input>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-input v-model="param.type" placeholder="类型"></el-input>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-input v-model="param.tag" placeholder="标签"></el-input>
+                                    </el-col>
+                                    <el-button plain type="danger" @click="removeClassOutParam(index)">移除</el-button>
+                                </el-row>
+                                <el-button @click="addClassOutParam('output')">新增出参</el-button>
+                            </el-form-item>
+                            <el-form-item label="本地依赖">
+                                <el-upload ref="upload" multiple :on-change="handleFileSelection"
+                                    :before-upload="() => false" :show-file-list="false">
+                                    <el-button slot="trigger" size="small" type="primary">选择文件</el-button>
+                                    <div v-if="addClassForm.localDependencies.length > 0">
+                                        已选择文件:
+                                        <ul>
+                                            <li v-for="(file, index) in addClassForm.localDependencies" :key="index">{{
+                        file.name }}</li>
+                                        </ul>
+                                    </div>
+                                </el-upload>
+                            </el-form-item>
+                        </el-form>
+                        <span slot="footer" class="dialog-footer">
+                            <el-button type="primary" @click="saveAddClass">保 存</el-button>
+                            <el-button @click="addClassDialogVisible = false">取 消</el-button>
+                        </span>
+                    </el-dialog>
+                    <el-dialog v-model="modifyGroupInfo" title="修改节点信息">
+                        <el-form :model="groupInfoForm" label-width="100px" :rule="groupInfoRules"
+                            ref="groupInfoFormRef">
+                            <el-form-item label="ip地址" prop="ip">
+                                <el-input v-model="groupInfoForm.ip" placeholder="请输入ip"></el-input>
+                            </el-form-item>
+                            <el-form-item label="端口" prop="port">
+                                <el-input-number v-model="groupInfoForm.port" placeholder="请输入端口号" :min="1" :max="65536"
+                                    :controls=false></el-input-number>
+                            </el-form-item>
+                            <el-form-item label="名称" prop="name">
+                                <el-input v-model="groupInfoForm.name" placeholder="请输入名称"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="saveGroupInfo(groupInfoFormRef)">保 存</el-button>
+                                <el-button @click="modifyGroupInfo = false">取 消</el-button>
+                            </el-form-item>
+                        </el-form>
 
-      </div>
+                    </el-dialog>
+                </div>
+            </div>
+            <div class="parent-canvas" ref="parent-canvas">
+                <div id="container" ref="container"></div>
+            </div>
+
+        </div>
     </div>
     <!-- <div>
         <button @click="saveGraph">SAVE</button>
@@ -131,14 +151,14 @@
 
 <script setup name="GraphEditor">
 import G6 from '@antv/g6';
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 // import { readFile } from 'original-fs';
 // import attrWindow from '@/components/attrWindow.vue';
 import {
-  PlusCircleOutlined,
-  MinusCircleOutlined,
-  CloudUploadOutlined ,
-  UserOutlined,
+    PlusCircleOutlined,
+    MinusCircleOutlined,
+    CloudUploadOutlined,
+    UserOutlined,
 } from '@ant-design/icons-vue';
 
 window.electronAPI.onSaveGraph((value) => {
@@ -271,23 +291,49 @@ const processParallelEdgesOnAnchorPoint = (
 //     },
 // ]);
 
+// const categories = ref([
+//     {
+//         categoryName: "节点",
+//         models: [
+//             { class_name: "1", description: "节点(1)", color: "#9EC9FF" },
+//             { class_name: "2", description: "节点(2)", color: "#9EC9FF" },
+//             { class_name: "3", description: "节点(3)", color: "#9EC9FF" },
+//             { class_name: "4", description: "节点(4)", color: "#9EC9FF" },
+//         ]
+//     },
+//     {
+//         categoryName: "模型",
+//         models: [
+//             { class_name: "A", description: "模型(A)", color: "#9EC9FF" },
+//             { class_name: "B", description: "模型(B)", color: "#9EC9FF" },
+//             { class_name: "C", description: "模型(C)", color: "#9EC9FF" },
+//             { class_name: "D", description: "模型(D)", color: "#9EC9FF" },
+//         ]
+//     },
+//     {
+//         categoryName: "自定义类",
+//         models: [
+
+//         ]
+//     },
+// ]);
 const categories = ref([
     {
         categoryName: "节点",
         models: [
-            { class_name: "1", description: "节点(1)", color: "#9EC9FF" },
-            { class_name: "2", description: "节点(2)", color: "#9EC9FF" },
-            { class_name: "3", description: "节点(3)", color: "#9EC9FF" },
-            { class_name: "4", description: "节点(4)", color: "#9EC9FF" },
+            { class_name: "group1", description: "节点(1)", color: "#337ecc", type: "group", ip: "127.0.0.1", port: 6001, name: "节点1" },
+            { class_name: "group2", description: "节点(2)", color: "#337ecc", type: "group", ip: "127.0.0.1", port: 6002, name: "节点2" },
+            { class_name: "group3", description: "节点(3)", color: "#337ecc", type: "group", ip: "127.0.0.1", port: 6003, name: "节点3" },
+            { class_name: "group4", description: "节点(4)", color: "#337ecc", type: "group", ip: "127.0.0.1", port: 6004, name: "节点4" },
         ]
     },
     {
         categoryName: "模型",
         models: [
-            { class_name: "A", description: "模型(A)", color: "#9EC9FF" },
-            { class_name: "B", description: "模型(B)", color: "#9EC9FF" },
-            { class_name: "C", description: "模型(C)", color: "#9EC9FF" },
-            { class_name: "D", description: "模型(D)", color: "#9EC9FF" },
+            { class_name: "A", description: "模型(A)", color: "#9EC9FF", type: "model" },
+            { class_name: "B", description: "模型(B)", color: "#9EC9FF", type: "model" },
+            { class_name: "C", description: "模型(C)", color: "#9EC9FF", type: "model" },
+            { class_name: "D", description: "模型(D)", color: "#9EC9FF", type: "model" },
         ]
     },
     {
@@ -319,6 +365,64 @@ let scaler = ref(100)
 function scale() {
     console.log(scaler.value / 100)
     graph.value.zoomTo(scaler.value / 100)
+}
+
+let modifyGroupInfo = ref(false)
+let groupInfoFormRef = ref()
+let groupInfoForm = ref({
+    ip: '',
+    port: 0,
+    name: ''
+})
+const validateIp = (rule, value, callback) => {
+    console.log(value)
+    if (value === '') {
+        callback(new Error('ip不可为空'))
+    } else {
+        const ipv4Regex = new RegExp('/^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$/')
+        console.log(ipv4Regex.test(value))
+        if (ipv4Regex.test(value)) {
+            callback()
+        }
+        else {
+            callback(new Error('ip格式错误'))
+        }
+    }
+}
+const groupInfoRules = reactive({
+    ip: [
+        { validator: validateIp, trigger: 'blur', required: true }
+    ],
+    port: [
+        { trigger: 'blur', required: true }
+    ],
+    name: [
+        { trigger: 'blur', required: true }
+    ]
+})
+
+async function saveGroupInfo(formEl) {
+    if (!formEl) return
+    console.log(formEl)
+    await formEl.validate((valid) => {
+        if (valid) {
+            console.log('submit!')
+            console.log(selectedItem.value)
+            let className = selectedItem.value.className
+            selectedItem.value.ip = groupInfoForm.value.ip
+            selectedItem.value.port = groupInfoForm.value.port
+            selectedItem.value.label = groupInfoForm.value.name
+            updateGraph()
+            // let model = categories.value[0].models.find(item => item.class_name == className)
+            // model.ip = groupInfoForm.ip
+            // model.port = groupInfoForm.port
+            // model.name = groupInfoForm.name
+            modifyGroupInfo.value = false
+            selectedItem.value = null
+        } else {
+            console.log('error submit!')
+        }
+    })
 }
 
 // for newly-added class
@@ -480,6 +584,7 @@ function initTooltip() {
         offsetX: 10,
         offsetY: 10,
         getContent(e) {
+            // console.log(e.target)
             const outDiv = document.createElement('div')
             outDiv.style.width = '180px'
             let type = e.item.getType();
@@ -494,11 +599,22 @@ function initTooltip() {
                     return outDiv
                 }
                 else {
-                    outDiv.innerHTML = `
-          <h4>Node</h4>
-          <ul><li>ID: ${e.item.getID()}</li></ul>
-          <ul><li>Code: ${e.item.getModel().label || e.item.getModel().id}</li></ul>
-          `
+                    let nodeClass = e.item.getModel().nodeClass
+                    if (nodeClass == 'group') {
+                        outDiv.innerHTML = `
+                            <h4>Node</h4>
+                            <ul><li>ID: ${e.item.getID()}</li></ul>
+                            <ul><li>ip: ${e.item.getModel().ip}</li></ul>
+                            <ul><li>port: ${e.item.getModel().port}</li></ul>
+                        `
+                    }
+                    else {
+                        outDiv.innerHTML = `
+                            <h4>Node</h4>
+                            <ul><li>ID: ${e.item.getID()}</li></ul>
+                            <ul><li>Code: ${e.item.getModel().label || e.item.getModel().id}</li></ul>
+                        `
+                    }
                     return outDiv
                 }
             }
@@ -738,6 +854,14 @@ function initGraph() {
     graph.value.on('dblclick', e => {
         console.log(e.item)
         if (e.item && e.item.getType() !== 'edge') {
+            let model = e.item.getModel()
+            console.log(model)
+            if (model.nodeClass === 'group') {
+                modifyGroupInfo.value = true
+                groupInfoForm.value.ip = model.ip
+                groupInfoForm.value.port = model.port
+                groupInfoForm.value.name = model.label
+            }
             selectedItem.value = e.item._cfg.model
             // selectedItem.value.className = "123123"
             console.log(e.item._cfg.model)
@@ -784,19 +908,11 @@ function initGraph() {
     updateGraph();
 }
 
-function onDragStart(event, className, categoryName) {
-    console.log("Drag: ", className, categoryName)
-
-    event.dataTransfer.setData('categoryName', categoryName)
-    let dragClass = null
-    if (categoryName == "节点") {
-        dragClass = jiedian.find(item => item.nodeName == className)
-        event.dataTransfer.setData('className', dragClass.nodeName)
-    }
-    else {
-        dragClass = classes.find(item => item.class_name == className)
-        event.dataTransfer.setData('className', dragClass.class_name)
-    }   
+function onDragStart(event, className, type) {
+    let dragClass = classes.find(item => item.class_name == className);
+    event.dataTransfer.setData('className', dragClass.class_name)
+    event.dataTransfer.setData('type', type)
+    // console.log("Drag Class: ", dragClass.class_name)
 }
 
 function setupDragEvents() {
@@ -812,18 +928,43 @@ function setupDragEvents() {
         //     console.log(point)
         //     point.attr({opacity:0})
         // })
-        console.log("drag data transfer")
-        let categoryName = event.dataTransfer.getData('categoryName')
-        if (categoryName == "节点"){
-            event.preventDefault();
-            let className = event.dataTransfer.getData('className')
-            let dragClass = jiedian.find(item => item.nodeName == className)
-            console.log("add 节点:", dragClass)
+        console.log("cececes")
+        event.preventDefault();
+        let type = event.dataTransfer.getData('type');
+        let className = event.dataTransfer.getData('className');
+        if (type == "group") {
+            // console.log(event.dataTransfer)
+            event.dataTransfer.clearData();
+            let nodeType = register(0, 0, 0, 0) // 节点应该不需要出入参数
+            let dragClass = classes.find(item => item.class_name == className);
+            let model = categories.value[dragClass.category].models.find(item => item.class_name == className)
+            // console.log(test)
+            let _ip = model.ip
+            let _port = model.port
+            let text = model.name
+            // text.replace("group", "节点")
+            if (nodeType) {
+                const model = {
+                    id: `${nodeType}-${count}`,
+                    className: className,
+                    ip: _ip,
+                    port: _port,
+                    x: event.offsetX,
+                    y: event.offsetY,
+                    type: nodeType,
+                    nodeClass: type,
+                    label: text,
+                    style: {
+                        "fill": categories.value[dragClass.category].models[0].color
+                    }
+                }
+                nodes.value.push(model); // Add node to nodes array
+                updateGraph(); // Re-render the graph
+            }
+
         }
         else {
-            // 模型
-            event.preventDefault();
-            let className = event.dataTransfer.getData('className');
+            // let className = event.dataTransfer.getData('className');
             let dragClass = classes.find(item => item.class_name == className);
             let inNum = dragClass.input_num;
             let outNum = dragClass.output_num;
@@ -841,6 +982,7 @@ function setupDragEvents() {
                     y: event.offsetY,
                     label: `${text}`,
                     type: nodeType,
+                    nodeClass: type,
                     style: {
                         "fill": categories.value[dragClass.category].models[0].color
                     }
