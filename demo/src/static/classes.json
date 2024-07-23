@@ -1,171 +1,171 @@
 {
-  "classes": [
-    {
-      "class_name": "A",
-      "input_num": 3,
-      "input_params": [
+    "classes": [
         {
-          "name": "a",
-          "type": "int",
-          "tag": "a is int"
+            "class_name": "A",
+            "input_num": 3,
+            "input_params": [
+                {
+                    "name": "a",
+                    "type": "int",
+                    "tag": "a is int"
+                },
+                {
+                    "name": "b",
+                    "type": "double",
+                    "tag": "b is double"
+                },
+                {
+                    "name": "c",
+                    "type": "boolean",
+                    "tag": "c is boolean"
+                }
+            ],
+            "code": "code of A",
+            "output_num": 2,
+            "output_params": [
+                {
+                    "name": "d",
+                    "type": "string",
+                    "tag": "d is string"
+                },
+                {
+                    "name": "e",
+                    "type": "int",
+                    "tag": "e is int"
+                }
+            ],
+            "category": 1,
+            "dependencies": []
         },
         {
-          "name": "b",
-          "type": "double",
-          "tag": "b is double"
+            "class_name": "B",
+            "input_num": 4,
+            "output_num": 3,
+            "input_params": [
+                {
+                    "name": "a",
+                    "type": "int",
+                    "tag": "a is int"
+                },
+                {
+                    "name": "b",
+                    "type": "double",
+                    "tag": "b is double"
+                },
+                {
+                    "name": "c",
+                    "type": "boolean",
+                    "tag": "c is boolean"
+                },
+                {
+                    "name": "d",
+                    "type": "int",
+                    "tag": "d is int"
+                }
+            ],
+            "code": "code of B",
+            "output_params": [
+                {
+                    "name": "e",
+                    "type": "int",
+                    "tag": "e is int"
+                },
+                {
+                    "name": "f",
+                    "type": "char",
+                    "tag": "f is char"
+                },
+                {
+                    "name": "g",
+                    "type": "boolean",
+                    "tag": "g is boolean"
+                }
+            ],
+            "category": 1,
+            "dependencies": [
+                "A",
+                "C",
+                "D"
+            ]
         },
         {
-          "name": "c",
-          "type": "boolean",
-          "tag": "c is boolean"
+            "class_name": "C",
+            "input_num": 1,
+            "output_num": 5,
+            "code": "code of C",
+            "input_params": [
+                {
+                    "name": "a",
+                    "type": "int",
+                    "tag": "a is int"
+                }
+            ],
+            "output_params": [
+                {
+                    "name": "e",
+                    "type": "int",
+                    "tag": "e is int"
+                },
+                {
+                    "name": "b",
+                    "type": "double",
+                    "tag": "b is double"
+                },
+                {
+                    "name": "c",
+                    "type": "boolean",
+                    "tag": "c is boolean"
+                },
+                {
+                    "name": "d",
+                    "type": "int",
+                    "tag": "d is int"
+                },
+                {
+                    "name": "f",
+                    "type": "string",
+                    "tag": "f is string"
+                }
+            ],
+            "category": 1,
+            "dependencies": [
+                "A",
+                "D"
+            ]
+        },
+        {
+            "class_name": "D",
+            "input_num": 1,
+            "output_num": 3,
+            "code": "code of D",
+            "input_params": [
+                {
+                    "name": "a",
+                    "type": "int",
+                    "tag": "a is int"
+                }
+            ],
+            "output_params": [
+                {
+                    "name": "b",
+                    "type": "double",
+                    "tag": "b is double"
+                },
+                {
+                    "name": "c",
+                    "type": "boolean",
+                    "tag": "c is boolean"
+                },
+                {
+                    "name": "d",
+                    "type": "int",
+                    "tag": "d is int"
+                }
+            ],
+            "category": 1,
+            "dependencies": [
+                "A"
+            ]
         }
-      ],
-      "code": "code of A",
-      "output_num": 2,
-      "output_params": [
-        {
-          "name": "d",
-          "type": "string",
-          "tag": "d is string"
-        },
-        {
-          "name": "e",
-          "type": "int",
-          "tag": "e is int"
-        }
-      ],
-      "category": 0,
-      "dependencies": []
-    },
-    {
-      "class_name": "B",
-      "input_num": 4,
-      "output_num": 3,
-      "input_params": [
-        {
-          "name": "a",
-          "type": "int",
-          "tag": "a is int"
-        },
-        {
-          "name": "b",
-          "type": "double",
-          "tag": "b is double"
-        },
-        {
-          "name": "c",
-          "type": "boolean",
-          "tag": "c is boolean"
-        },
-        {
-          "name": "d",
-          "type": "int",
-          "tag": "d is int"
-        }
-      ],
-      "code": "code of B",
-      "output_params": [
-        {
-          "name": "e",
-          "type": "int",
-          "tag": "e is int"
-        },
-        {
-          "name": "f",
-          "type": "char",
-          "tag": "f is char"
-        },
-        {
-          "name": "g",
-          "type": "boolean",
-          "tag": "g is boolean"
-        }
-      ],
-      "category": 0,
-      "dependencies": [
-        "A",
-        "C",
-        "D"
-      ]
-    },
-    {
-      "class_name": "C",
-      "input_num": 1,
-      "output_num": 5,
-      "code": "code of C",
-      "input_params": [
-        {
-          "name": "a",
-          "type": "int",
-          "tag": "a is int"
-        }
-      ],
-      "output_params": [
-        {
-          "name": "e",
-          "type": "int",
-          "tag": "e is int"
-        },
-        {
-          "name": "b",
-          "type": "double",
-          "tag": "b is double"
-        },
-        {
-          "name": "c",
-          "type": "boolean",
-          "tag": "c is boolean"
-        },
-        {
-          "name": "d",
-          "type": "int",
-          "tag": "d is int"
-        },
-        {
-          "name": "f",
-          "type": "string",
-          "tag": "f is string"
-        }
-      ],
-      "category": 1,
-      "dependencies": [
-        "A",
-        "D"
-      ]
-    },
-    {
-      "class_name": "D",
-      "input_num": 1,
-      "output_num": 3,
-      "code": "code of D",
-      "input_params": [
-        {
-          "name": "a",
-          "type": "int",
-          "tag": "a is int"
-        }
-      ],
-      "output_params": [
-        {
-          "name": "b",
-          "type": "double",
-          "tag": "b is double"
-        },
-        {
-          "name": "c",
-          "type": "boolean",
-          "tag": "c is boolean"
-        },
-        {
-          "name": "d",
-          "type": "int",
-          "tag": "d is int"
-        }
-      ],
-      "category": 1,
-      "dependencies": [
-        "A"
-      ]
-    }
-  ]
+    ]
 }
