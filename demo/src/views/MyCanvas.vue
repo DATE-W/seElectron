@@ -2,97 +2,123 @@
     <!-- <div style="margin-bottom:20px;">
         <el-input-number v-model="scaler" :step="10" min="20" max="200" @change="scale" />
     </div> -->
-    <div style="width:auto">
-        <div style="display:flex;">
-            <div id="shape-selector"
-                style="width: 20vw; height: 90vh; border: 1px solid #ccc; padding: 0; display:block; flex-direction:column; justify-items:center; align-items:center">
-                <!-- <div v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
-                    <h3>{{ category.categoryName }}</h3>
-                    <div v-for="model in category.models" :key="model.class_name" class="drag-node model"
-                        draggable="true" @dragstart="onDragStart($event, model.class_name)"
-                        :style="{ backgroundColor: model.color }">
-                        {{ model.description }}
-                    </div>
-                </div> -->
-                <el-collapse>
-                    <el-collapse-item v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
-                        <!-- <h3>{{ category.categoryName }}</h3> -->
-                        <template v-slot:title>
-                            <span style="padding-left:20px">{{ category.categoryName }}</span>
-                        </template>
-                        <div v-for="model in category.models" :key="model.class_name" class="drag-node model"
-                            draggable="true" @dragstart="onDragStart($event, model.class_name, category.categoryName)"
-                            :style="{ backgroundColor: model.color }">
-                            {{ model.description }}
-                        </div>
-                    </el-collapse-item>
-                </el-collapse>
-                <div id="class-adder">
-                    <el-button @click="addClassDialogVisible = true">新增类</el-button>
-                    <el-dialog v-model="addClassDialogVisible" title="新增类">
-                        <el-form :model="addClassForm" label-width="100px">
-                            <el-form-item label="类名">
-                                <el-input v-model="addClassForm.className" placeholder="请输入类名"></el-input>
-                            </el-form-item>
-                            <el-form-item label="代码">
-                                <el-input v-model="addClassForm.code" placeholder="请输入类代码"></el-input>
-                            </el-form-item>
-                            <el-form-item label="入参信息">
-                                <el-row v-for="(param, index) in addClassForm.inParams" :key="index">
-                                    <el-col :span="8">
-                                        <el-input v-model="param.name" placeholder="名称"></el-input>
-                                    </el-col>
-                                    <el-col :span="8">
-                                        <el-input v-model="param.type" placeholder="类型"></el-input>
-                                    </el-col>
-                                    <el-col :span="8">
-                                        <el-input v-model="param.tag" placeholder="标签"></el-input>
-                                    </el-col>
-                                    <el-button plain type="danger" @click="removeClassInParam(index)">移除</el-button>
-                                </el-row>
-                                <el-button @click="addClassInParam('input')">新增入参</el-button>
-                            </el-form-item>
-                            <el-form-item label="出参信息">
-                                <el-row v-for="(param, index) in addClassForm.outParams" :key="index">
-                                    <el-col :span="8">
-                                        <el-input v-model="param.name" placeholder="名称"></el-input>
-                                    </el-col>
-                                    <el-col :span="8">
-                                        <el-input v-model="param.type" placeholder="类型"></el-input>
-                                    </el-col>
-                                    <el-col :span="8">
-                                        <el-input v-model="param.tag" placeholder="标签"></el-input>
-                                    </el-col>
-                                    <el-button plain type="danger" @click="removeClassOutParam(index)">移除</el-button>
-                                </el-row>
-                                <el-button @click="addClassOutParam('output')">新增出参</el-button>
-                            </el-form-item>
-                            <el-form-item label="本地依赖">
-                                <el-upload ref="upload" multiple :on-change="handleFileSelection"
-                                    :before-upload="() => false" :show-file-list="false">
-                                    <el-button slot="trigger" size="small" type="primary">选择文件</el-button>
-                                    <div v-if="addClassForm.localDependencies.length > 0">
-                                        已选择文件:
-                                        <ul>
-                                            <li v-for="(file, index) in addClassForm.localDependencies" :key="index">{{
-                        file.name }}</li>
-                                        </ul>
-                                    </div>
-                                </el-upload>
-                            </el-form-item>
-                        </el-form>
-                        <span slot="footer" class="dialog-footer">
-                            <el-button type="primary" @click="saveAddClass">保 存</el-button>
-                            <el-button @click="addClassDialogVisible = false">取 消</el-button>
-                        </span>
-                    </el-dialog>
-                </div>
-            </div>
-            <div class="parent-canvas" ref="parent-canvas">
-                <div id="container" ref="container"></div>
-            </div>
 
+    <div style="width:auto">
+      <a-flex justify="space-between" align="flex-start">
+        <div>
+          <a-button type="text">
+            <PlusCircleOutlined />放大
+          </a-button>
+
+          <a-divider type="vertical" style="height: auto" />
+
+          <a-button type="text">
+            <MinusCircleOutlined />缩小
+          </a-button>
+
+          <a-divider type="vertical" style="height: auto" />
+
+          <a-button type="text">
+            <CloudUploadOutlined />导出
+          </a-button>
         </div>
+        <div style="margin-right: 10px">
+          <a-button type="text">
+            <UserOutlined />
+          </a-button>
+        </div>
+
+      </a-flex>
+      <div style="display:flex;">
+          <div id="shape-selector"
+              style="width: 20vw; height: 90vh; border: 1px solid #ccc; padding: 0; display:block; flex-direction:column; justify-items:center; align-items:center">
+              <!-- <div v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
+                  <h3>{{ category.categoryName }}</h3>
+                  <div v-for="model in category.models" :key="model.class_name" class="drag-node model"
+                      draggable="true" @dragstart="onDragStart($event, model.class_name)"
+                      :style="{ backgroundColor: model.color }">
+                      {{ model.description }}
+                  </div>
+              </div> -->
+              <el-collapse>
+                  <el-collapse-item v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
+                      <!-- <h3>{{ category.categoryName }}</h3> -->
+                      <template v-slot:title>
+                          <span style="padding-left:20px">{{ category.categoryName }}</span>
+                      </template>
+                      <div v-for="model in category.models" :key="model.class_name" class="drag-node model"
+                          draggable="true" @dragstart="onDragStart($event, model.class_name, category.categoryName)"
+                          :style="{ backgroundColor: model.color }">
+                          {{ model.description }}
+                      </div>
+                  </el-collapse-item>
+              </el-collapse>
+              <div id="class-adder">
+                  <el-button @click="addClassDialogVisible = true">新增类</el-button>
+                  <el-dialog v-model="addClassDialogVisible" title="新增类">
+                      <el-form :model="addClassForm" label-width="100px">
+                          <el-form-item label="类名">
+                              <el-input v-model="addClassForm.className" placeholder="请输入类名"></el-input>
+                          </el-form-item>
+                          <el-form-item label="代码">
+                              <el-input v-model="addClassForm.code" placeholder="请输入类代码"></el-input>
+                          </el-form-item>
+                          <el-form-item label="入参信息">
+                              <el-row v-for="(param, index) in addClassForm.inParams" :key="index">
+                                  <el-col :span="8">
+                                      <el-input v-model="param.name" placeholder="名称"></el-input>
+                                  </el-col>
+                                  <el-col :span="8">
+                                      <el-input v-model="param.type" placeholder="类型"></el-input>
+                                  </el-col>
+                                  <el-col :span="8">
+                                      <el-input v-model="param.tag" placeholder="标签"></el-input>
+                                  </el-col>
+                                  <el-button plain type="danger" @click="removeClassInParam(index)">移除</el-button>
+                              </el-row>
+                              <el-button @click="addClassInParam('input')">新增入参</el-button>
+                          </el-form-item>
+                          <el-form-item label="出参信息">
+                              <el-row v-for="(param, index) in addClassForm.outParams" :key="index">
+                                  <el-col :span="8">
+                                      <el-input v-model="param.name" placeholder="名称"></el-input>
+                                  </el-col>
+                                  <el-col :span="8">
+                                      <el-input v-model="param.type" placeholder="类型"></el-input>
+                                  </el-col>
+                                  <el-col :span="8">
+                                      <el-input v-model="param.tag" placeholder="标签"></el-input>
+                                  </el-col>
+                                  <el-button plain type="danger" @click="removeClassOutParam(index)">移除</el-button>
+                              </el-row>
+                              <el-button @click="addClassOutParam('output')">新增出参</el-button>
+                          </el-form-item>
+                          <el-form-item label="本地依赖">
+                              <el-upload ref="upload" multiple :on-change="handleFileSelection"
+                                  :before-upload="() => false" :show-file-list="false">
+                                  <el-button slot="trigger" size="small" type="primary">选择文件</el-button>
+                                  <div v-if="addClassForm.localDependencies.length > 0">
+                                      已选择文件:
+                                      <ul>
+                                          <li v-for="(file, index) in addClassForm.localDependencies" :key="index">{{
+                      file.name }}</li>
+                                      </ul>
+                                  </div>
+                              </el-upload>
+                          </el-form-item>
+                      </el-form>
+                      <span slot="footer" class="dialog-footer">
+                          <el-button type="primary" @click="saveAddClass">保 存</el-button>
+                          <el-button @click="addClassDialogVisible = false">取 消</el-button>
+                      </span>
+                  </el-dialog>
+              </div>
+          </div>
+          <div class="parent-canvas" ref="parent-canvas">
+              <div id="container" ref="container"></div>
+          </div>
+
+      </div>
     </div>
     <!-- <div>
         <button @click="saveGraph">SAVE</button>
@@ -108,6 +134,12 @@ import G6 from '@antv/g6';
 import { ref, onMounted } from 'vue'
 // import { readFile } from 'original-fs';
 // import attrWindow from '@/components/attrWindow.vue';
+import {
+  PlusCircleOutlined,
+  MinusCircleOutlined,
+  CloudUploadOutlined ,
+  UserOutlined,
+} from '@ant-design/icons-vue';
 
 window.electronAPI.onSaveGraph((value) => {
     saveGraph()

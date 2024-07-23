@@ -1,6 +1,6 @@
 <template>
     <div>
-        <function-button style="width: 100vw;"/>
+<!--        <function-button style="width: 100vw;"/>-->
         <my-canvas />
     </div>
 
