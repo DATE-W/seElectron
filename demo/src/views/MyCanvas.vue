@@ -6,14 +6,27 @@
         <div style="display:flex;">
             <div id="shape-selector"
                 style="width: 20vw; height: 90vh; border: 1px solid #ccc; padding: 0; display:block; flex-direction:column; justify-items:center; align-items:center">
-                <div v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
+                <!-- <div v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
                     <h3>{{ category.categoryName }}</h3>
                     <div v-for="model in category.models" :key="model.class_name" class="drag-node model"
                         draggable="true" @dragstart="onDragStart($event, model.class_name)"
                         :style="{ backgroundColor: model.color }">
                         {{ model.description }}
                     </div>
-                </div>
+                </div> -->
+                <el-collapse>
+                    <el-collapse-item v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
+                        <!-- <h3>{{ category.categoryName }}</h3> -->
+                        <template v-slot:title>
+                            <span style="padding-left:20px">{{ category.categoryName }}</span>
+                        </template>
+                        <div v-for="model in category.models" :key="model.class_name" class="drag-node model"
+                            draggable="true" @dragstart="onDragStart($event, model.class_name)"
+                            :style="{ backgroundColor: model.color }">
+                            {{ model.description }}
+                        </div>
+                    </el-collapse-item>
+                </el-collapse>
                 <div id="class-adder">
                     <el-button @click="addClassDialogVisible = true">新增类</el-button>
                     <el-dialog v-model="addClassDialogVisible" title="新增类">
@@ -62,7 +75,7 @@
                                         已选择文件:
                                         <ul>
                                             <li v-for="(file, index) in addClassForm.localDependencies" :key="index">{{
-            file.name }}</li>
+                        file.name }}</li>
                                         </ul>
                                     </div>
                                 </el-upload>
@@ -75,7 +88,7 @@
                     </el-dialog>
                 </div>
             </div>
-            <div  class="parent-canvas" ref="parent-canvas">
+            <div class="parent-canvas" ref="parent-canvas">
                 <div id="container" ref="container"></div>
             </div>
 
@@ -203,19 +216,37 @@ const processParallelEdgesOnAnchorPoint = (
 };
 
 // 实际接入后端后，改为在init时进行处理
+// const categories = ref([
+//     {
+//         categoryName: "第一类",
+//         models: [
+//             { class_name: "A", description: "矩形-3-2(A)", color: "#9EC9FF" },
+//             { class_name: "B", description: "矩形-4-3(B)", color: "#9EC9FF" },
+//         ]
+//     },
+//     {
+//         categoryName: "第二类",
+//         models: [
+//             { class_name: "C", description: "矩形-1-5(C)", color: "#FFD700" },
+//             { class_name: "D", description: "矩形-1-3(D)", color: "#FFD700" },
+//         ]
+//     },
+//     {
+//         categoryName: "自定义类",
+//         models: [
+
+//         ]
+//     },
+// ]);
+
 const categories = ref([
     {
         categoryName: "第一类",
         models: [
-            { class_name: "A", description: "矩形-3-2(A)", color: "#9EC9FF" },
-            { class_name: "B", description: "矩形-4-3(B)", color: "#9EC9FF" },
-        ]
-    },
-    {
-        categoryName: "第二类",
-        models: [
-            { class_name: "C", description: "矩形-1-5(C)", color: "#FFD700" },
-            { class_name: "D", description: "矩形-1-3(D)", color: "#FFD700" },
+            { class_name: "A", description: "类型(A)", color: "#9EC9FF" },
+            { class_name: "B", description: "类型(B)", color: "#9EC9FF" },
+            { class_name: "C", description: "类型(C)", color: "#9EC9FF" },
+            { class_name: "D", description: "类型(D)", color: "#9EC9FF" },
         ]
     },
     {
@@ -225,7 +256,6 @@ const categories = ref([
         ]
     },
 ]);
-
 
 let graph = ref(null)
 let nodes = ref([])
@@ -883,10 +913,9 @@ function loadGraphFromData(data) {
 }
 
 .parent-canvas {
-    min-width: 80vw; 
+    min-width: 80vw;
     flex-grow: 1;
     min-height: 90vh;
-    border: 1px
-    solid #ccc;
+    border: 1px solid #ccc;
 }
 </style>
