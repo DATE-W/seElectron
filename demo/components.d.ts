@@ -7,6 +7,12 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AButton: typeof import('ant-design-vue/es')['Button']
+    ADivider: typeof import('ant-design-vue/es')['Divider']
+    AFlex: typeof import('ant-design-vue/es')['Flex']
+    ARadio: typeof import('ant-design-vue/es')['Radio']
+    ARadioGroup: typeof import('ant-design-vue/es')['RadioGroup']
+    ASlider: typeof import('ant-design-vue/es')['Slider']
     AttrWindow: typeof import('./src/components/attrWindow.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCol: typeof import('element-plus/es')['ElCol']

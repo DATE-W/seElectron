@@ -1,6 +1,6 @@
 <template>
     <div>
-        <function-button style="height: 10vh; width: 100vw;">123</function-button>
+        <function-button style="width: 100vw;"/>
         <my-canvas />
     </div>
 
