@@ -554,8 +554,10 @@ function initGraph() {
     // this.canvas_height = this.$refs.parent-canvas.ClientHeight;
     graph.value = new G6.Graph({
         container: 'container',
-        width: this.canvas_width,
-        height: this.canvas_height,
+        // width: this.canvas_width,
+        // height: this.canvas_height,
+        width: 600,
+        height: 800,
         plugins: [menu, tooltip],
         modes: {
             default: [
