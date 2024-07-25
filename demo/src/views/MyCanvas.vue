@@ -347,6 +347,7 @@ const categories = ref([
 let graph = ref(null)
 let nodes = ref([])
 let edges = ref([])
+let groups = ref([])
 let sourceAnchorIdx, targetAnchorIdx
 let registeredNodes = ref([])
 // const menu = ref(null)
@@ -579,6 +580,7 @@ function register(inNum, outNum, inPar, outPar) {
     return newName
 }
 
+
 function initTooltip() {
     const tooltip = new G6.Tooltip({
         offsetX: 10,
@@ -715,11 +717,19 @@ function initGraph() {
         container: 'container',
         // width: this.canvas_width,
         // height: this.canvas_height,
-        width: 600,
-        height: 800,
+        width: 1920,
+        height: 1080,
         plugins: [menu, tooltip],
+        groupType: 'rect',
+        groupByTypes: 'false',
+        groupStyle: {
+            default: {},
+            hover: {},
+            collapse: {},
+        },
         modes: {
             default: [
+                'drag-group', 'drag-node-with-group', 'collapse-expand-group',
                 'drag-canvas',
                 'zoom-canvas',
                 // config the shouldBegin for drag-node to avoid node moving while dragging on the anchor-point circles
@@ -770,13 +780,14 @@ function initGraph() {
                 }],
         },
         defaultNode: {
-            type: 'rect-node',
-            size: [60, 100],
-            style: {
-                fill: '#9EC9FF',
-                stroke: '#5B8FF9',
-                lineWidth: 2,
-            },
+            shape: 'rect'
+            // type: 'rect-node',
+            // size: [60, 100],
+            // style: {
+            //     fill: '#9EC9FF',
+            //     stroke: '#5B8FF9',
+            //     lineWidth: 2,
+            // },
         },
         defaultEdge: {
             type: 'quadratic',
@@ -902,7 +913,7 @@ function initGraph() {
         // graph.value.setItemState(e.item, 'showAnchors', false);
         // console.log('dragend')
         isDragging.value = false;
-        hideAnchorPointsVisibility(e.item)
+        hideAnchorPointsVisibility(e.item) 
     })
     // Initial render
     updateGraph();
@@ -935,7 +946,7 @@ function setupDragEvents() {
         if (type == "group") {
             // console.log(event.dataTransfer)
             event.dataTransfer.clearData();
-            let nodeType = register(0, 0, 0, 0) // 节点应该不需要出入参数
+            // let nodeType = register(0, 0, 0, 0) // 节点应该不需要出入参数
             let dragClass = classes.find(item => item.class_name == className);
             let model = categories.value[dragClass.category].models.find(item => item.class_name == className)
             // console.log(test)
@@ -943,22 +954,25 @@ function setupDragEvents() {
             let _port = model.port
             let text = model.name
             // text.replace("group", "节点")
-            if (nodeType) {
+            if (true) {
+                count++; 
                 const model = {
-                    id: `${nodeType}-${count}`,
+                    id: `jiedian-${count}`,
+                    title: `${count}`,
                     className: className,
                     ip: _ip,
                     port: _port,
                     x: event.offsetX,
                     y: event.offsetY,
-                    type: nodeType,
+                    size:[500,300],
+                    type: 'rect',
                     nodeClass: type,
                     label: text,
                     style: {
                         "fill": categories.value[dragClass.category].models[0].color
-                    }
+                    },
                 }
-                nodes.value.push(model); // Add node to nodes array
+                groups.value.push(model); 
                 updateGraph(); // Re-render the graph
             }
 
@@ -977,12 +991,14 @@ function setupDragEvents() {
             if (nodeType) {
                 const model = {
                     id: `${nodeType}-${count}`,
+                    comboId: 'jiedian-1', 
                     className: className,
                     x: event.offsetX,
                     y: event.offsetY,
                     label: `${text}`,
                     type: nodeType,
                     nodeClass: type,
+                    size: [90,160],
                     style: {
                         "fill": categories.value[dragClass.category].models[0].color
                     }
@@ -998,6 +1014,7 @@ function updateGraph() {
     graph.value.data({
         nodes: nodes.value,
         edges: edges.value,
+        combos: groups.value,
     });
     G6.Util.processParallelEdges(edges.value);
     sourceAnchorIdx = null;
