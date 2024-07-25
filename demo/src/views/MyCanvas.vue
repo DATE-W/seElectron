@@ -700,7 +700,7 @@ function initMenu() {
         offsetY: 0,
         // the types of items that allow the menu show up
         // 在哪些类型的元素上响应
-        itemTypes: ['node', 'edge'],
+        itemTypes: ['node', 'edge', 'combo'],
     })
     return menu;
 }
