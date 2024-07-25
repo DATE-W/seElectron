@@ -729,6 +729,7 @@ function initGraph() {
         },
         modes: {
             default: [
+                'drag-combo', 'drag-node-with-combo',
                 'drag-group', 'drag-node-with-group', 'collapse-expand-group',
                 'drag-canvas',
                 'zoom-canvas',
@@ -913,7 +914,7 @@ function initGraph() {
         // graph.value.setItemState(e.item, 'showAnchors', false);
         // console.log('dragend')
         isDragging.value = false;
-        hideAnchorPointsVisibility(e.item) 
+        hideAnchorPointsVisibility(e.item)
     })
     // Initial render
     updateGraph();
@@ -955,7 +956,7 @@ function setupDragEvents() {
             let text = model.name
             // text.replace("group", "节点")
             if (true) {
-                count++; 
+                count++;
                 const model = {
                     id: `jiedian-${count}`,
                     title: `${count}`,
@@ -964,7 +965,7 @@ function setupDragEvents() {
                     port: _port,
                     x: event.offsetX,
                     y: event.offsetY,
-                    size:[500,300],
+                    size: [500, 300],
                     type: 'rect',
                     nodeClass: type,
                     label: text,
@@ -972,7 +973,7 @@ function setupDragEvents() {
                         "fill": categories.value[dragClass.category].models[0].color
                     },
                 }
-                groups.value.push(model); 
+                groups.value.push(model);
                 updateGraph(); // Re-render the graph
             }
 
@@ -991,14 +992,14 @@ function setupDragEvents() {
             if (nodeType) {
                 const model = {
                     id: `${nodeType}-${count}`,
-                    comboId: 'jiedian-1', 
+                    // comboId: 'jiedian-1',
                     className: className,
                     x: event.offsetX,
                     y: event.offsetY,
                     label: `${text}`,
                     type: nodeType,
                     nodeClass: type,
-                    size: [90,160],
+                    size: [90, 160],
                     style: {
                         "fill": categories.value[dragClass.category].models[0].color
                     }
