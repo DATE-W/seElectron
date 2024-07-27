@@ -331,19 +331,20 @@ const categories = ref([
     {
         categoryName: "节点",
         models: [
-            { class_name: "group1", description: "节点(1)", color: "#e3ecfa", type: "group", ip: "127.0.0.1", port: 6001, name: "节点1" },
-            { class_name: "group2", description: "节点(2)", color: "#e3ecfa", type: "group", ip: "127.0.0.1", port: 6002, name: "节点2" },
-            { class_name: "group3", description: "节点(3)", color: "#e3ecfa", type: "group", ip: "127.0.0.1", port: 6003, name: "节点3" },
-            { class_name: "group4", description: "节点(4)", color: "#e3ecfa", type: "group", ip: "127.0.0.1", port: 6004, name: "节点4" },
+            { class_name: "group1", description: "计算节点", color: "#fff", type: "group", ip: "127.0.0.1", port: 6001, name: "计算节点" },
+            { class_name: "group2", description: "GPU计算节点", color: "#fff", type: "group", ip: "127.0.0.1", port: 6002, name: "GPU计算节点" },
+            { class_name: "group3", description: "存储节点", color: "#fff", type: "group", ip: "127.0.0.1", port: 6003, name: "存储节点" },
+            { class_name: "group4", description: "通讯节点", color: "#fff", type: "group", ip: "127.0.0.1", port: 6004, name: "通讯节点" }
         ]
     },
     {
         categoryName: "模型",
         models: [
-            { class_name: "A", description: "模型(A)", color: "#d3d6e0", type: "model" },
-            { class_name: "B", description: "模型(B)", color: "#d3d6e0", type: "model" },
-            { class_name: "C", description: "模型(C)", color: "#d3d6e0", type: "model" },
-            { class_name: "D", description: "模型(D)", color: "#d3d6e0", type: "model" },
+            { class_name: "导引头模型", description: "导引头模型", color: "#fff", type: "model" },
+            { class_name: "控制模型", description: "控制模型", color: "#fff", type: "model" },
+            { class_name: "弹体模型", description: "弹体模型", color: "#fff", type: "model" },
+            { class_name: "目标运动模型", description: "目标运动模型", color: "#fff", type: "model" },
+            { class_name: "相对运动模型", description: "相对运动模型", color: "#fff", type: "model" }
         ]
     },
     {
@@ -487,7 +488,7 @@ function saveAddClass() {
     categories.value.find(item => item.categoryName == "自定义类").models.push({
         class_name: addClassForm.value.className,
         description: `矩形-${addClassForm.value.inParams.length}-${addClassForm.value.outParams.length}-(${addClassForm.value.className})`,
-        color: "#00D7FF"
+        color: "#fff"
     });
 
     addClassDialogVisible.value = false;
@@ -1073,7 +1074,7 @@ function loadGraph(event) {
                     categories.value.find(item => item.categoryName == "自定义类").models.push({
                         class_name: cla.class_name,
                         description: `矩形-${cla.input_num}-${cla.output_num}-(${cla.class_name})`,
-                        color: "#00D7FF"
+                        color: "#fff"
                     })
                 }
             })
@@ -1105,7 +1106,7 @@ function loadGraphFromData(data) {
                 categories.value.find(item => item.categoryName == "自定义类").models.push({
                     class_name: cla.class_name,
                     description: `矩形-${cla.input_num}-${cla.output_num}-(${cla.class_name})`,
-                    color: "#00D7FF"
+                    color: "#fff"
                 })
             }
         })
@@ -1150,6 +1151,6 @@ function loadGraphFromData(data) {
     min-width: 80vw;
     flex-grow: 1;
     min-height: 90vh;
-    border: 1px solid #ccc;
+    border: 1px solid #fff;
 }
 </style>
