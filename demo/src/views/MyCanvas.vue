@@ -3,22 +3,23 @@
         <el-input-number v-model="scaler" :step="10" min="20" max="200" @change="scale" />
     </div> -->
 
-    <div style="width:auto">
+    <div style="width:100vw">
         <a-flex justify="space-between" align="flex-start">
             <div>
-                <a-button type="text">
-                    <PlusCircleOutlined />放大
-                </a-button>
+              <a-button type="text" >
+                  <PlusCircleOutlined />放大
+              </a-button>
+              <a-button type="text" style="margin-left: -1vh">
+                  <MinusCircleOutlined />缩小
+              </a-button>
+              <a-button type="text" style="margin-left: -1vh">
+                <PlayCircleOutlined />运行
+              </a-button>
+              <a-button type="text" style="margin-left: -1vh">
+                <PauseCircleOutlined />终止
+              </a-button>
 
-                <a-divider type="vertical" style="height: auto" />
-
-                <a-button type="text">
-                    <MinusCircleOutlined />缩小
-                </a-button>
-
-                <a-divider type="vertical" style="height: auto" />
-
-                <a-button type="text">
+                <a-button type="text" style="margin-left: -1vh">
                     <CloudUploadOutlined />导出
                 </a-button>
             </div>
@@ -31,7 +32,8 @@
         </a-flex>
         <div style="display:flex;">
             <div id="shape-selector"
-                style="width: 20vw; height: 90vh; border: 1px solid #ccc; padding: 0; display:block; flex-direction:column; justify-items:center; align-items:center">
+                style="width: 21vw; height: 90vh; border: 0px solid #ccc; padding-left: 0.5vw;
+                display:block; flex-direction:column; justify-items:center; align-items:center">
                 <!-- <div v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
                   <h3>{{ category.categoryName }}</h3>
                   <div v-for="model in category.models" :key="model.class_name" class="drag-node model"
@@ -41,19 +43,21 @@
                   </div>
               </div> -->
                 <el-collapse>
-                    <el-collapse-item v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
+                    <el-collapse-item v-for="(category, index) in categories" :key="index" >
                         <!-- <h3>{{ category.categoryName }}</h3> -->
                         <template v-slot:title>
                             <span style="padding-left:20px">{{ category.categoryName }}</span>
                         </template>
+                      <div style="margin-top: -0.5vh;">
                         <div v-for="model in category.models" :key="model.class_name" class="drag-node model"
-                            draggable="true" @dragstart="onDragStart($event, model.class_name, model.type)"
-                            :style="{ backgroundColor: model.color }">
-                            {{ model.description }}
+                             draggable="true" @dragstart="onDragStart($event, model.class_name, model.type)"
+                             :style="{ backgroundColor: model.color }">
+                          {{ model.description }}
                         </div>
+                      </div>
                     </el-collapse-item>
                 </el-collapse>
-                <div id="class-adder">
+                <div id="class-adder" style="margin: 2vh;">
                     <el-button @click="addClassDialogVisible = true">新增类</el-button>
                     <el-dialog v-model="addClassDialogVisible" title="新增类">
                         <el-form :model="addClassForm" label-width="100px">
@@ -159,6 +163,8 @@ import {
     MinusCircleOutlined,
     CloudUploadOutlined,
     UserOutlined,
+    PlayCircleOutlined,
+    PauseCircleOutlined,
 } from '@ant-design/icons-vue';
 
 window.electronAPI.onSaveGraph((value) => {
@@ -272,8 +278,8 @@ const processParallelEdgesOnAnchorPoint = (
 //     {
 //         categoryName: "第一类",
 //         models: [
-//             { class_name: "A", description: "矩形-3-2(A)", color: "#9EC9FF" },
-//             { class_name: "B", description: "矩形-4-3(B)", color: "#9EC9FF" },
+//             { class_name: "A", description: "矩形-3-2(A)", color: "#d3d6e0" },
+//             { class_name: "B", description: "矩形-4-3(B)", color: "#d3d6e0" },
 //         ]
 //     },
 //     {
@@ -295,19 +301,19 @@ const processParallelEdgesOnAnchorPoint = (
 //     {
 //         categoryName: "节点",
 //         models: [
-//             { class_name: "1", description: "节点(1)", color: "#9EC9FF" },
-//             { class_name: "2", description: "节点(2)", color: "#9EC9FF" },
-//             { class_name: "3", description: "节点(3)", color: "#9EC9FF" },
-//             { class_name: "4", description: "节点(4)", color: "#9EC9FF" },
+//             { class_name: "1", description: "节点(1)", color: "#d3d6e0" },
+//             { class_name: "2", description: "节点(2)", color: "#d3d6e0" },
+//             { class_name: "3", description: "节点(3)", color: "#d3d6e0" },
+//             { class_name: "4", description: "节点(4)", color: "#d3d6e0" },
 //         ]
 //     },
 //     {
 //         categoryName: "模型",
 //         models: [
-//             { class_name: "A", description: "模型(A)", color: "#9EC9FF" },
-//             { class_name: "B", description: "模型(B)", color: "#9EC9FF" },
-//             { class_name: "C", description: "模型(C)", color: "#9EC9FF" },
-//             { class_name: "D", description: "模型(D)", color: "#9EC9FF" },
+//             { class_name: "A", description: "模型(A)", color: "#d3d6e0" },
+//             { class_name: "B", description: "模型(B)", color: "#d3d6e0" },
+//             { class_name: "C", description: "模型(C)", color: "#d3d6e0" },
+//             { class_name: "D", description: "模型(D)", color: "#d3d6e0" },
 //         ]
 //     },
 //     {
@@ -321,19 +327,19 @@ const categories = ref([
     {
         categoryName: "节点",
         models: [
-            { class_name: "group1", description: "节点(1)", color: "#337ecc", type: "group", ip: "127.0.0.1", port: 6001, name: "节点1" },
-            { class_name: "group2", description: "节点(2)", color: "#337ecc", type: "group", ip: "127.0.0.1", port: 6002, name: "节点2" },
-            { class_name: "group3", description: "节点(3)", color: "#337ecc", type: "group", ip: "127.0.0.1", port: 6003, name: "节点3" },
-            { class_name: "group4", description: "节点(4)", color: "#337ecc", type: "group", ip: "127.0.0.1", port: 6004, name: "节点4" },
+            { class_name: "group1", description: "节点(1)", color: "#e3ecfa", type: "group", ip: "127.0.0.1", port: 6001, name: "节点1" },
+            { class_name: "group2", description: "节点(2)", color: "#e3ecfa", type: "group", ip: "127.0.0.1", port: 6002, name: "节点2" },
+            { class_name: "group3", description: "节点(3)", color: "#e3ecfa", type: "group", ip: "127.0.0.1", port: 6003, name: "节点3" },
+            { class_name: "group4", description: "节点(4)", color: "#e3ecfa", type: "group", ip: "127.0.0.1", port: 6004, name: "节点4" },
         ]
     },
     {
         categoryName: "模型",
         models: [
-            { class_name: "A", description: "模型(A)", color: "#9EC9FF", type: "model" },
-            { class_name: "B", description: "模型(B)", color: "#9EC9FF", type: "model" },
-            { class_name: "C", description: "模型(C)", color: "#9EC9FF", type: "model" },
-            { class_name: "D", description: "模型(D)", color: "#9EC9FF", type: "model" },
+            { class_name: "A", description: "模型(A)", color: "#d3d6e0", type: "model" },
+            { class_name: "B", description: "模型(B)", color: "#d3d6e0", type: "model" },
+            { class_name: "C", description: "模型(C)", color: "#d3d6e0", type: "model" },
+            { class_name: "D", description: "模型(D)", color: "#d3d6e0", type: "model" },
         ]
     },
     {
@@ -785,7 +791,7 @@ function initGraph() {
             // type: 'rect-node',
             // size: [60, 100],
             // style: {
-            //     fill: '#9EC9FF',
+            //     fill: '#d3d6e0',
             //     stroke: '#5B8FF9',
             //     lineWidth: 2,
             // },
@@ -1120,12 +1126,12 @@ function loadGraphFromData(data) {
 
 <style scoped>
 .model {
-    width: 120px;
+    width: 10vw;
     height: 40px;
     cursor: grab;
-    margin-bottom: 5px;
-    display: flex;
+    margin-top: 5px;
     border-radius: 10%;
+    display: flex;
     justify-content: center;
     align-items: center;
 }
