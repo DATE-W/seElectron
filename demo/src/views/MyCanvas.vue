@@ -47,7 +47,7 @@
                     <el-sub-menu v-for="(category, index) in categories" :key="index" :index="index" >
                         <!-- <h3>{{ category.categoryName }}</h3> -->
                         <template v-slot:title>
-                            <BorderOuterOutlined style="margin-right: 0.5vh"/>
+                            <AlignLeftOutlined style="margin-right: 0.5vh"/>
                             <span style="font-weight: 700">{{ category.categoryName }}</span>
                         </template>
                       <div style="margin-top: -0.5vh;display:flex; flex-direction:column; justify-items:center; align-items:center">
@@ -168,6 +168,7 @@ import {
     UserOutlined,
     PlayCircleOutlined,
     PauseCircleOutlined,
+    AlignLeftOutlined,
   BorderOuterOutlined
 } from '@ant-design/icons-vue';
 
@@ -1009,7 +1010,7 @@ function setupDragEvents() {
                     label: `${text}`,
                     type: nodeType,
                     nodeClass: type,
-                    size: [90, 160],
+                    size: [90, 60],
                     style: {
                         "fill": categories.value[dragClass.category].models[0].color
                     }
