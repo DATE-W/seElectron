@@ -4,6 +4,7 @@
     </div> -->
 
     <div style="width:100vw">
+        <!-- 功能区-->
         <a-flex justify="space-between" align="flex-start">
             <div>
               <a-button type="text" >
@@ -32,7 +33,7 @@
         </a-flex>
         <div style="display:flex;">
             <div id="shape-selector"
-                style="width: 21vw; height: 90vh; border: 0px solid #ccc; padding-left: 0.5vw;
+                style="width: 20vw; height: 90vh; border: 0px solid #ccc; padding-left: 0.5vw;
                 display:block; flex-direction:column; justify-items:center; align-items:center">
                 <!-- <div v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
                   <h3>{{ category.categoryName }}</h3>
@@ -42,21 +43,22 @@
                       {{ model.description }}
                   </div>
               </div> -->
-                <el-collapse>
-                    <el-collapse-item v-for="(category, index) in categories" :key="index" >
+                <el-menu>
+                    <el-sub-menu v-for="(category, index) in categories" :key="index" :index="index" >
                         <!-- <h3>{{ category.categoryName }}</h3> -->
                         <template v-slot:title>
-                            <span style="padding-left:20px">{{ category.categoryName }}</span>
+                            <BorderOuterOutlined style="margin-right: 0.5vh"/>
+                            <span style="font-weight: 700">{{ category.categoryName }}</span>
                         </template>
-                      <div style="margin-top: -0.5vh;">
-                        <div v-for="model in category.models" :key="model.class_name" class="drag-node model"
+                      <div style="margin-top: -0.5vh;display:flex; flex-direction:column; justify-items:center; align-items:center">
+                        <el-menu-item v-for="model in category.models" :key="model.class_name" class="drag-node model"
                              draggable="true" @dragstart="onDragStart($event, model.class_name, model.type)"
                              :style="{ backgroundColor: model.color }">
                           {{ model.description }}
-                        </div>
+                        </el-menu-item>
                       </div>
-                    </el-collapse-item>
-                </el-collapse>
+                    </el-sub-menu>
+                </el-menu>
                 <div id="class-adder" style="margin: 2vh;">
                     <el-button @click="addClassDialogVisible = true">新增类</el-button>
                     <el-dialog v-model="addClassDialogVisible" title="新增类">
@@ -138,6 +140,7 @@
                     </el-dialog>
                 </div>
             </div>
+            <!--画布-->
             <div class="parent-canvas" ref="parent-canvas">
                 <div id="container" ref="container"></div>
             </div>
@@ -165,6 +168,7 @@ import {
     UserOutlined,
     PlayCircleOutlined,
     PauseCircleOutlined,
+  BorderOuterOutlined
 } from '@ant-design/icons-vue';
 
 window.electronAPI.onSaveGraph((value) => {
@@ -1131,9 +1135,9 @@ function loadGraphFromData(data) {
     cursor: grab;
     margin-top: 5px;
     border-radius: 10%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    /*display: flex;*/
+    /*justify-content: center;*/
+    /*align-items: center;*/
 }
 
 .g6-component-tooltip {
