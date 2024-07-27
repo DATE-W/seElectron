@@ -25,171 +25,119 @@
             "category": 0
         },
         {
-            "class_name": "A",
-            "input_num": 3,
+            "class_name": "导引头模型",
+            "input_num": 1,
             "input_params": [
                 {
                     "name": "a",
-                    "type": "int",
-                    "tag": "a is int"
-                },
-                {
-                    "name": "b",
-                    "type": "double",
-                    "tag": "b is double"
-                },
-                {
-                    "name": "c",
-                    "type": "boolean",
-                    "tag": "c is boolean"
+                    "type": "struct",
+                    "tag": "a is struct"
                 }
             ],
-            "code": "code of A",
-            "output_num": 2,
+            "code": "导引头模型",
+            "output_num": 1,
             "output_params": [
                 {
-                    "name": "d",
-                    "type": "string",
-                    "tag": "d is string"
-                },
-                {
-                    "name": "e",
-                    "type": "int",
-                    "tag": "e is int"
+                    "name": "b",
+                    "type": "struct",
+                    "tag": "b is struct"
                 }
             ],
             "category": 1,
             "dependencies": []
         },
         {
-            "class_name": "B",
-            "input_num": 4,
-            "output_num": 3,
+            "class_name": "控制模型",
+            "input_num": 1,
+            "output_num": 1,
             "input_params": [
                 {
                     "name": "a",
-                    "type": "int",
-                    "tag": "a is int"
-                },
-                {
-                    "name": "b",
-                    "type": "double",
-                    "tag": "b is double"
-                },
-                {
-                    "name": "c",
-                    "type": "boolean",
-                    "tag": "c is boolean"
-                },
-                {
-                    "name": "d",
-                    "type": "int",
-                    "tag": "d is int"
+                    "type": "struct",
+                    "tag": "a is struct"
                 }
             ],
-            "code": "code of B",
+            "code": "控制模型",
             "output_params": [
                 {
-                    "name": "e",
-                    "type": "int",
-                    "tag": "e is int"
-                },
-                {
-                    "name": "f",
-                    "type": "char",
-                    "tag": "f is char"
-                },
-                {
-                    "name": "g",
-                    "type": "boolean",
-                    "tag": "g is boolean"
+                    "name": "b",
+                    "type": "struct",
+                    "tag": "b is struct"
                 }
             ],
             "category": 1,
-            "dependencies": [
-                "A",
-                "C",
-                "D"
-            ]
+            "dependencies": []
         },
         {
-            "class_name": "C",
+            "class_name": "弹体模型",
             "input_num": 1,
-            "output_num": 5,
-            "code": "code of C",
+            "output_num": 1,
+            "code": "弹体模型",
             "input_params": [
                 {
                     "name": "a",
-                    "type": "int",
-                    "tag": "a is int"
+                    "type": "struct",
+                    "tag": "a is struct"
                 }
             ],
             "output_params": [
                 {
-                    "name": "e",
-                    "type": "int",
-                    "tag": "e is int"
-                },
-                {
                     "name": "b",
-                    "type": "double",
-                    "tag": "b is double"
-                },
-                {
-                    "name": "c",
-                    "type": "boolean",
-                    "tag": "c is boolean"
-                },
-                {
-                    "name": "d",
-                    "type": "int",
-                    "tag": "d is int"
-                },
-                {
-                    "name": "f",
-                    "type": "string",
-                    "tag": "f is string"
+                    "type": "struct",
+                    "tag": "b is struct"
                 }
             ],
             "category": 1,
-            "dependencies": [
-                "A",
-                "D"
-            ]
+            "dependencies": []
         },
         {
-            "class_name": "D",
+            "class_name": "目标运动模型",
             "input_num": 1,
-            "output_num": 3,
-            "code": "code of D",
+            "output_num": 1,
+            "code": "目标运动模型",
             "input_params": [
                 {
                     "name": "a",
-                    "type": "int",
-                    "tag": "a is int"
+                    "type": "struct",
+                    "tag": "a is struct"
                 }
             ],
             "output_params": [
                 {
                     "name": "b",
-                    "type": "double",
-                    "tag": "b is double"
-                },
-                {
-                    "name": "c",
-                    "type": "boolean",
-                    "tag": "c is boolean"
-                },
-                {
-                    "name": "d",
-                    "type": "int",
-                    "tag": "d is int"
+                    "type": "struct",
+                    "tag": "b is struct"
                 }
             ],
             "category": 1,
-            "dependencies": [
-                "A"
-            ]
+            "dependencies": []
+        },
+        {
+            "class_name": "相对运动模型",
+            "input_num": 2,
+            "output_num": 1,
+            "code": "相对运动模型",
+            "input_params": [
+                {
+                    "name": "a",
+                    "type": "struct",
+                    "tag": "a is struct"
+                },
+                {
+                    "name": "b",
+                    "type": "struct",
+                    "tag": "b is struct"
+                }
+            ],
+            "output_params": [
+                {
+                    "name": "c",
+                    "type": "struct",
+                    "tag": "c is struct"
+                }
+            ],
+            "category": 1,
+            "dependencies": []
         }
     ]
 }
