@@ -345,6 +345,7 @@ const categories = ref([
             { class_name: "控制模型", description: "控制模型", color: "#fff", type: "model" },
             { class_name: "弹体模型", description: "弹体模型", color: "#fff", type: "model" },
             { class_name: "目标运动模型", description: "目标运动模型", color: "#fff", type: "model" },
+            { class_name: "信号转换模块", description: "信号转换模块", color: "#fff", type: "model" },
             { class_name: "相对运动模型", description: "相对运动模型", color: "#fff", type: "model" }
         ]
     },
@@ -533,9 +534,10 @@ function getRectAnchors(inNum, outNum) {
     return anchors
 }
 
-function register(inNum, outNum, inPar, outPar) {
+function register(inNum, outNum, inPar, outPar, className) {
     count++;
     registeredNodes.value.push({
+        class_name: className,
         input_num: inNum,
         output_num: outNum,
         input_params: inPar,
@@ -550,6 +552,12 @@ function register(inNum, outNum, inPar, outPar) {
         // draw anchor-point circles according to the anchorPoints in afterDraw
         afterDraw(cfg, group) {
             const bbox = group.getBBox();
+
+            // 用className找到注册过的类
+            console.log('afterdraw:', cfg.id, cfg.className)
+            let cla = registeredNodes.value.find(ele => ele.class_name == cfg.className) 
+            // console.log(cla.input_num,cla.input_params,cla.output_num,cla.output_params)
+
             const anchorPoints = this.getAnchorPoints(cfg)
             anchorPoints.forEach((anchorPos, i) => {
                 const isEntryPoint = i < inNum;
@@ -569,12 +577,20 @@ function register(inNum, outNum, inPar, outPar) {
                     visible: true, // invisible by default, shows up when links > 1 or the node is in showAnchors state
                     draggable: true, // allow to catch the drag events on this shape
                     pointType: isEntryPoint ? 'entry' : 'exit', // 入点或出点
-                    parType: isEntryPoint ? inPar[i].type : outPar[i - inNum].type,
-                    parName: isEntryPoint ? inPar[i].name : outPar[i - inNum].name,
-                    parTag: isEntryPoint ? inPar[i].tag : outPar[i - inNum].tag,
+
+                    // parType: isEntryPoint ? inPar[i].type : outPar[i - inNum].type,
+                    // parName: isEntryPoint ? inPar[i].name : outPar[i - inNum].name,
+                    // parTag: isEntryPoint ? inPar[i].tag : outPar[i - inNum].tag,
+                    
+                    // 采用以上写法会导致bug：在相同出/入锚点数量时全部使用最新的inPar/outPar
+
+                    parType: isEntryPoint ? cla.input_params[i].type : cla.output_params[i - inNum].type,
+                    parName: isEntryPoint ? cla.input_params[i].name : cla.output_params[i - inNum].name,
+                    parTag: isEntryPoint ? cla.input_params[i].tag : cla.output_params[i - inNum].tag,
                     available: true
                 })
             })
+            // console.log(registeredNodes.value,inPar,outPar)
         },
 
         // response the state changes and show/hide the link-point circles
@@ -605,11 +621,11 @@ function initTooltip() {
             if (type == 'node') {
                 if (e.target.get('name') == 'anchor-point') {
                     outDiv.innerHTML = `
-          <h4>Anchor Point</h4>
-          <ul><li>Name: ${e.target.get('parName')}</li></ul>
-          <ul><li>Type: ${e.target.get('parType')}</li></ul>
-          <ul><li>Tag: ${e.target.get('parTag')}</li></ul>
-          `
+                        <h4>Anchor Point</h4>
+                        <ul><li>Name: ${e.target.get('parName')}</li></ul>
+                        <ul><li>Type: ${e.target.get('parType')}</li></ul>
+                        <ul><li>Tag: ${e.target.get('parTag')}</li></ul>
+                        `
                     return outDiv
                 }
                 else {
@@ -998,13 +1014,15 @@ function setupDragEvents() {
         else {
             // let className = event.dataTransfer.getData('className');
             let dragClass = classes.find(item => item.class_name == className);
+            console.log('Drag:', dragClass)
             let inNum = dragClass.input_num;
             let outNum = dragClass.output_num;
             let inPar = dragClass.input_params;
             let outPar = dragClass.output_params;
             let text = dragClass.code;
+            let class_name = dragClass.class_name;
             event.dataTransfer.clearData();
-            let nodeType = register(inNum, outNum, inPar, outPar);
+            let nodeType = register(inNum, outNum, inPar, outPar, class_name);
             // console.log(categories.value)
             if (nodeType) {
                 const model = {

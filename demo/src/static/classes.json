@@ -30,8 +30,8 @@
             "input_params": [
                 {
                     "name": "a",
-                    "type": "struct",
-                    "tag": "a is struct"
+                    "type": "[int,double]",
+                    "tag": "a is [int,double]"
                 }
             ],
             "code": "导引头模型",
@@ -39,8 +39,8 @@
             "output_params": [
                 {
                     "name": "b",
-                    "type": "struct",
-                    "tag": "b is struct"
+                    "type": "[int,int,string]",
+                    "tag": "b is [int,int,string]"
                 }
             ],
             "category": 1,
@@ -53,16 +53,16 @@
             "input_params": [
                 {
                     "name": "a",
-                    "type": "struct",
-                    "tag": "a is struct"
+                    "type": "[int,int,string]",
+                    "tag": "a is [int,int,string]"
                 }
             ],
             "code": "控制模型",
             "output_params": [
                 {
                     "name": "b",
-                    "type": "struct",
-                    "tag": "b is struct"
+                    "type": "[int,string,int]",
+                    "tag": "b is [int,string,int]"
                 }
             ],
             "category": 1,
@@ -76,15 +76,15 @@
             "input_params": [
                 {
                     "name": "a",
-                    "type": "struct",
-                    "tag": "a is struct"
+                    "type": "[int,string,int]",
+                    "tag": "a is [int,string,int]"
                 }
             ],
             "output_params": [
                 {
                     "name": "b",
-                    "type": "struct",
-                    "tag": "b is struct"
+                    "type": "[int,double,double]",
+                    "tag": "b is [int,double,double]"
                 }
             ],
             "category": 1,
@@ -98,15 +98,42 @@
             "input_params": [
                 {
                     "name": "a",
-                    "type": "struct",
-                    "tag": "a is struct"
+                    "type": "[double,double]",
+                    "tag": "a is [double,double]"
                 }
             ],
             "output_params": [
                 {
                     "name": "b",
-                    "type": "struct",
-                    "tag": "b is struct"
+                    "type": "[string,string]",
+                    "tag": "b is [string,string]"
+                }
+            ],
+            "category": 1,
+            "dependencies": []
+        },
+        {
+            "class_name": "信号转换模块",
+            "input_num": 2,
+            "output_num": 1,
+            "code": "信号转换模块",
+            "input_params": [
+                {
+                    "name": "a",
+                    "type": "[int,double,double]",
+                    "tag": "a is [int,double,double]"
+                },
+                {
+                    "name": "b",
+                    "type": "[string,string]",
+                    "tag": "b is [string,string]"
+                }
+            ],
+            "output_params": [
+                {
+                    "name": "c",
+                    "type": "[double,double,int]",
+                    "tag": "c is [double,double,int]"
                 }
             ],
             "category": 1,
@@ -114,26 +141,21 @@
         },
         {
             "class_name": "相对运动模型",
-            "input_num": 2,
+            "input_num": 1,
             "output_num": 1,
             "code": "相对运动模型",
             "input_params": [
                 {
                     "name": "a",
-                    "type": "struct",
-                    "tag": "a is struct"
-                },
-                {
-                    "name": "b",
-                    "type": "struct",
-                    "tag": "b is struct"
+                    "type": "[double,double,int]",
+                    "tag": "a is [double,double,int]"
                 }
             ],
             "output_params": [
                 {
                     "name": "c",
-                    "type": "struct",
-                    "tag": "c is struct"
+                    "type": "[int,double]",
+                    "tag": "c is [int,double]"
                 }
             ],
             "category": 1,
