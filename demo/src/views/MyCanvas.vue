@@ -47,13 +47,8 @@
                     <el-sub-menu v-for="(category, index) in categories" :key="index" :index="index" >
                         <!-- <h3>{{ category.categoryName }}</h3> -->
                         <template v-slot:title>
-<<<<<<< HEAD
                             <BorderOuterOutlined style="margin-right: 0.5vh"/>
                             <span style="font-weight: 700;font-size: 18px;">{{ category.categoryName }}</span>
-=======
-                            <AlignLeftOutlined style="margin-right: 0.5vh"/>
-                            <span style="font-weight: 700">{{ category.categoryName }}</span>
->>>>>>> 5377a42a3648cddee194ae1671164be2204af357
                         </template>
                       <div style="margin-top: -0.5vh;display:flex; flex-direction:column; justify-items:center; align-items:center">
                         <el-menu-item v-for="model in category.models" :key="model.class_name" class="drag-node model"
