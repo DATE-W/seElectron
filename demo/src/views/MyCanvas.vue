@@ -48,7 +48,7 @@
                         <!-- <h3>{{ category.categoryName }}</h3> -->
                         <template v-slot:title>
                             <BorderOuterOutlined style="margin-right: 0.5vh"/>
-                            <span style="font-weight: 700">{{ category.categoryName }}</span>
+                            <span style="font-weight: 700;font-size: 18px;">{{ category.categoryName }}</span>
                         </template>
                       <div style="margin-top: -0.5vh;display:flex; flex-direction:column; justify-items:center; align-items:center">
                         <el-menu-item v-for="model in category.models" :key="model.class_name" class="drag-node model"
@@ -980,6 +980,11 @@ function setupDragEvents() {
                     type: 'rect',
                     nodeClass: type,
                     label: text,
+                    labelCfg: {
+                        style: {
+                            fontSize: 16
+                        },
+                    },
                     style: {
                         "fill": categories.value[dragClass.category].models[0].color
                     },
@@ -1008,9 +1013,14 @@ function setupDragEvents() {
                     x: event.offsetX,
                     y: event.offsetY,
                     label: `${text}`,
+                    labelCfg: {
+                        style: {
+                            fontSize: 15
+                        },
+                    },
                     type: nodeType,
                     nodeClass: type,
-                    size: [90, 160],
+                    size: [90, 60],
                     style: {
                         "fill": categories.value[dragClass.category].models[0].color
                     }
@@ -1136,9 +1146,13 @@ function loadGraphFromData(data) {
     cursor: grab;
     margin-top: 5px;
     border-radius: 10%;
-    /*display: flex;*/
-    /*justify-content: center;*/
-    /*align-items: center;*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 0 !important; 
+    padding-right: 0 !important;
+    border: 1px solid black;
+    font-size: 16px;
 }
 
 .g6-component-tooltip {
