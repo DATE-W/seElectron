@@ -160,6 +160,30 @@
             ],
             "category": 1,
             "dependencies": []
+        },
+        {
+            "class_name": "resource1",
+            "ip": "127.0.0.1",
+            "port": "5001",
+            "category": 2
+        },
+        {
+            "class_name": "resource2",
+            "ip": "127.0.0.1",
+            "port": "5002",
+            "category": 2
+        },
+        {
+            "class_name": "resource3",
+            "ip": "127.0.0.1",
+            "port": "5003",
+            "category": 2
+        },
+        {
+            "class_name": "resource4",
+            "ip": "127.0.0.1",
+            "port": "5004",
+            "category": 2
         }
     ]
 }

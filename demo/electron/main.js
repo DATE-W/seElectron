@@ -18,6 +18,12 @@ async function fileOpen() {
         })
     }
 }
+const exec = require('child_process').exec
+
+function executeCommand(event, command) {
+    console.log(command)
+    exec(command)
+}
 
 function createWindow() {
     // 创建浏览器窗口
@@ -107,6 +113,7 @@ function createWindow() {
 // 部分 API 在 ready 事件触发后才能使用。
 app.whenReady().then(() => {
     ipcMain.handle('dialog:openFile', fileOpen)
+    ipcMain.on('executeCommand', executeCommand)
     createWindow()
     app.on('activate', function () {
         // 通常在 macOS 上，当点击 dock 中的应用程序图标时，如果没有其他

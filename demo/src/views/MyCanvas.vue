@@ -7,19 +7,26 @@
         <!-- 功能区-->
         <a-flex justify="space-between" align="flex-start">
             <div>
-              <a-button type="text" >
-                  <PlusCircleOutlined />放大
-              </a-button>
-              <a-button type="text" style="margin-left: -1vh">
-                  <MinusCircleOutlined />缩小
-              </a-button>
-              <a-button type="text" style="margin-left: -1vh">
-                <PlayCircleOutlined />运行
-              </a-button>
-              <a-button type="text" style="margin-left: -1vh">
-                <PauseCircleOutlined />终止
-              </a-button>
-
+                <a-button type="text">
+                    <PlusCircleOutlined />放大
+                </a-button>
+                <a-button type="text" style="margin-left: -1vh">
+                    <MinusCircleOutlined />缩小
+                </a-button>
+                <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh"
+                    @click="() => { simuStarted = true }">
+                    <PlayCircleOutlined />开始仿真
+                </a-button>
+                <a-button v-show="simuStarted" type="text" style="margin-left: -1vh"
+                    @click="() => { simuStarted = false }">
+                    <PauseCircleOutlined />结束仿真
+                </a-button>
+                <a-button :disabled="!simuStarted" type="text" style="margin-left: -1vh" @click="runSimulation">
+                    <PlayCircleOutlined />运行
+                </a-button>
+                <a-button :disabled="!simuStarted" type="text" style="margin-left: -1vh" @click="stopSimulation">
+                    <PauseCircleOutlined />终止
+                </a-button>
                 <a-button type="text" style="margin-left: -1vh">
                     <CloudUploadOutlined />导出
                 </a-button>
@@ -32,8 +39,7 @@
 
         </a-flex>
         <div style="display:flex;">
-            <div id="shape-selector"
-                style="width: 20vw; height: 90vh; border: 0px solid #ccc; padding-left: 0.5vw;
+            <div id="shape-selector" style="width: 20vw; height: 90vh; border: 0px solid #ccc; padding-left: 0.5vw;
                 display:block; flex-direction:column; justify-items:center; align-items:center">
                 <!-- <div v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
                   <h3>{{ category.categoryName }}</h3>
@@ -44,23 +50,42 @@
                   </div>
               </div> -->
                 <el-menu>
-                    <el-sub-menu v-for="(category, index) in categories" :key="index" :index="index" >
-                        <!-- <h3>{{ category.categoryName }}</h3> -->
-                        <template v-slot:title>
-                            <BorderOuterOutlined style="margin-right: 0.5vh"/>
-                            <span style="font-weight: 700;font-size: 18px;">{{ category.categoryName }}</span>
-                        </template>
-                      <div style="margin-top: -0.5vh;display:flex; flex-direction:column; justify-items:center; align-items:center">
-                        <el-menu-item v-for="model in category.models" :key="model.class_name" class="drag-node model"
-                             draggable="true" @dragstart="onDragStart($event, model.class_name, model.type)"
-                             :style="{ backgroundColor: model.color }">
-                          {{ model.description }}
-                        </el-menu-item>
-                      </div>
-                    </el-sub-menu>
+                    <template v-for="(category, index) in categories" :key="index">
+                        <el-sub-menu v-show="!simuStarted" v-if="category.categoryName != '仿真资源'">
+                            <!-- <h3>{{ category.categoryName }}</h3> -->
+                            <template v-slot:title>
+                                <BorderOuterOutlined style="margin-right: 0.5vh" />
+                                <span style="font-weight: 700;font-size: 18px;">{{ category.categoryName }}</span>
+                            </template>
+                            <div
+                                style="margin-top: -0.5vh;display:flex; flex-direction:column; justify-items:center; align-items:center">
+                                <el-menu-item v-for="model in category.models" :key="model.class_name"
+                                    class="drag-node model" draggable="true"
+                                    @dragstart="onDragStart($event, model.class_name, model.type)"
+                                    :style="{ backgroundColor: model.color }">
+                                    {{ model.description }}
+                                </el-menu-item>
+                            </div>
+                        </el-sub-menu>
+                        <el-sub-menu v-show="simuStarted" v-if="category.categoryName == '仿真资源'">
+                            <template v-slot:title>
+                                <BorderOuterOutlined style="margin-right: 0.5vh" />
+                                <span style="font-weight: 700;font-size: 18px;">{{ category.categoryName }}</span>
+                            </template>
+                            <div
+                                style="margin-top: -0.5vh;display:flex; flex-direction:column; justify-items:center; align-items:center">
+                                <el-menu-item v-for="model in category.models" :key="model.class_name"
+                                    class="drag-node model" draggable="true"
+                                    @dragstart="onDragStart($event, model.class_name, model.type)"
+                                    :style="{ backgroundColor: model.color }">
+                                    {{ model.description }}
+                                </el-menu-item>
+                            </div>
+                        </el-sub-menu>
+                    </template>
                 </el-menu>
                 <div id="class-adder" style="margin: 2vh;">
-                    <el-button @click="addClassDialogVisible = true">新增类</el-button>
+                    <el-button v-show="!simuStarted" @click="addClassDialogVisible = true">新增类</el-button>
                     <el-dialog v-model="addClassDialogVisible" title="新增类">
                         <el-form :model="addClassForm" label-width="100px">
                             <el-form-item label="类名">
@@ -107,7 +132,7 @@
                                         已选择文件:
                                         <ul>
                                             <li v-for="(file, index) in addClassForm.localDependencies" :key="index">{{
-                        file.name }}</li>
+                    file.name }}</li>
                                         </ul>
                                     </div>
                                 </el-upload>
@@ -158,7 +183,7 @@
 
 <script setup name="GraphEditor">
 import G6 from '@antv/g6';
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, computed } from 'vue'
 // import { readFile } from 'original-fs';
 // import attrWindow from '@/components/attrWindow.vue';
 import {
@@ -169,7 +194,7 @@ import {
     PlayCircleOutlined,
     PauseCircleOutlined,
     AlignLeftOutlined,
-  BorderOuterOutlined
+    BorderOuterOutlined
 } from '@ant-design/icons-vue';
 
 window.electronAPI.onSaveGraph((value) => {
@@ -190,6 +215,16 @@ window.electronAPI.onNewClass(async (value) => {
 // display
 const selectedItem = ref(null)
 let count = 0;
+let resCount = 0;
+const simuStarted = ref(false)
+
+function runSimulation() {
+    window.electronAPI.executeCommand("notepad")
+}
+
+function stopSimulation() {
+    console.log("终止仿真")
+}
 
 const processParallelEdgesOnAnchorPoint = (
     edges,
@@ -347,6 +382,15 @@ const categories = ref([
             { class_name: "目标运动模型", description: "目标运动模型", color: "#fff", type: "model" },
             { class_name: "信号转换模块", description: "信号转换模块", color: "#fff", type: "model" },
             { class_name: "相对运动模型", description: "相对运动模型", color: "#fff", type: "model" }
+        ]
+    },
+    {
+        categoryName: "仿真资源",
+        models: [
+            { class_name: "resource1", description: "机器A", color: "#fff", type: "resource", ip: "127.0.0.1", port: 6001, name: "机器A" },
+            { class_name: "resource2", description: "机器B", color: "#fff", type: "resource", ip: "127.0.0.1", port: 6002, name: "机器B" },
+            { class_name: "resource3", description: "机器C", color: "#fff", type: "resource", ip: "127.0.0.1", port: 6003, name: "机器C" },
+            { class_name: "resource4", description: "机器D", color: "#fff", type: "resource", ip: "127.0.0.1", port: 6004, name: "机器D" },
         ]
     },
     {
@@ -555,7 +599,7 @@ function register(inNum, outNum, inPar, outPar, className) {
 
             // 用className找到注册过的类
             console.log('afterdraw:', cfg.id, cfg.className)
-            let cla = registeredNodes.value.find(ele => ele.class_name == cfg.className) 
+            let cla = registeredNodes.value.find(ele => ele.class_name == cfg.className)
             // console.log(cla.input_num,cla.input_params,cla.output_num,cla.output_params)
 
             const anchorPoints = this.getAnchorPoints(cfg)
@@ -581,7 +625,7 @@ function register(inNum, outNum, inPar, outPar, className) {
                     // parType: isEntryPoint ? inPar[i].type : outPar[i - inNum].type,
                     // parName: isEntryPoint ? inPar[i].name : outPar[i - inNum].name,
                     // parTag: isEntryPoint ? inPar[i].tag : outPar[i - inNum].tag,
-                    
+
                     // 采用以上写法会导致bug：在相同出/入锚点数量时全部使用最新的inPar/outPar
 
                     parType: isEntryPoint ? cla.input_params[i].type : cla.output_params[i - inNum].type,
@@ -618,7 +662,7 @@ function initTooltip() {
             const outDiv = document.createElement('div')
             outDiv.style.width = '180px'
             let type = e.item.getType();
-            if (type == 'node') {
+            if (type == 'node' || type == 'combo') {
                 if (e.target.get('name') == 'anchor-point') {
                     outDiv.innerHTML = `
                         <h4>Anchor Point</h4>
@@ -630,7 +674,8 @@ function initTooltip() {
                 }
                 else {
                     let nodeClass = e.item.getModel().nodeClass
-                    if (nodeClass == 'group') {
+                    // console.log(nodeClass)
+                    if (nodeClass == 'resource') {
                         outDiv.innerHTML = `
                             <h4>Node</h4>
                             <ul><li>ID: ${e.item.getID()}</li></ul>
@@ -673,7 +718,7 @@ function initTooltip() {
                 return outDiv
             }
         },
-        itemTypes: ['node', 'edge']
+        itemTypes: ['node', 'edge', 'combo']
     })
     return tooltip
 }
@@ -720,6 +765,7 @@ function initMenu() {
             graph.value.removeItem(item);
             edges.value = graph.value.save().edges
             nodes.value = graph.value.save().nodes
+            groups.value = graph.value.save().combos
         },
         // offsetX and offsetY include the padding of the parent container
         // 需要加上父级容器的 padding-left 16 与自身偏移量 10
@@ -896,7 +942,7 @@ function initGraph() {
         if (e.item && e.item.getType() !== 'edge') {
             let model = e.item.getModel()
             console.log(model)
-            if (model.nodeClass === 'group') {
+            if (model.nodeClass === 'resource') {
                 modifyGroupInfo.value = true
                 groupInfoForm.value.ip = model.ip
                 groupInfoForm.value.port = model.port
@@ -972,21 +1018,31 @@ function setupDragEvents() {
         event.preventDefault();
         let type = event.dataTransfer.getData('type');
         let className = event.dataTransfer.getData('className');
-        if (type == "group") {
+        if (type == "group" || type == "resource") {
             // console.log(event.dataTransfer)
             event.dataTransfer.clearData();
             // let nodeType = register(0, 0, 0, 0) // 节点应该不需要出入参数
             let dragClass = classes.find(item => item.class_name == className);
             let model = categories.value[dragClass.category].models.find(item => item.class_name == className)
+            // let models = categories.value.find(item => {
+            //     if (item) {
+            //         return item.models[0].class_name == className
+            //     }
+            //     return false
+            // })
+            // let model = models.find(item => item.class_name == className)
             // console.log(test)
             let _ip = model.ip
             let _port = model.port
             let text = model.name
             // text.replace("group", "节点")
             if (true) {
-                count++;
+                if (type == 'group')
+                    count++;
+                else if (type == 'resource')
+                    resCount++;
                 const model = {
-                    id: `jiedian-${count}`,
+                    id: type == 'group' ? `jiedian-${count}` : `resource-${resCount}`,
                     title: `${count}`,
                     className: className,
                     ip: _ip,
@@ -1168,7 +1224,7 @@ function loadGraphFromData(data) {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-left: 0 !important; 
+    padding-left: 0 !important;
     padding-right: 0 !important;
     border: 1px solid black;
     font-size: 16px;
