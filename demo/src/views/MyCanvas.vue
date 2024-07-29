@@ -634,7 +634,6 @@ function register(inNum, outNum, inPar, outPar, className) {
                     available: true
                 })
             })
-            // console.log(registeredNodes.value,inPar,outPar)
         },
 
         // response the state changes and show/hide the link-point circles
@@ -658,7 +657,6 @@ function initTooltip() {
         offsetX: 10,
         offsetY: 10,
         getContent(e) {
-            // console.log(e.target)
             const outDiv = document.createElement('div')
             outDiv.style.width = '180px'
             let type = e.item.getType();
@@ -674,7 +672,6 @@ function initTooltip() {
                 }
                 else {
                     let nodeClass = e.item.getModel().nodeClass
-                    // console.log(nodeClass)
                     if (nodeClass == 'resource') {
                         outDiv.innerHTML = `
                             <h4>Node</h4>
@@ -745,7 +742,6 @@ function initMenu() {
             const outDiv = document.createElement('div');
             outDiv.style.cursor = 'pointer'
             outDiv.innerHTML = '<p id="deleteNode">删除</p>'
-            console.log(outDiv)
             // let btn = outDiv.querySelector('#deleteNode')
             // console.log(btn)
             // btn.addEventListener('click', test)
@@ -919,7 +915,6 @@ function initGraph() {
     // if create-edge is canceled before ending, update the 'links' on the anchor-point circles
     graph.value.on('afterremoveitem', e => {
         if (e.item && e.item.source && e.item.target) {
-            // console.log(e.item)
             const sourceNode = graph.value.findById(e.item.source);
             const targetNode = graph.value.findById(e.item.target);
             const { sourceAnchor, targetAnchor } = e.item;
@@ -938,7 +933,6 @@ function initGraph() {
 
     // 节点双击事件
     graph.value.on('dblclick', e => {
-        console.log(e.item)
         if (e.item && e.item.getType() !== 'edge') {
             let model = e.item.getModel()
             console.log(model)

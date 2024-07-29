@@ -22,7 +22,21 @@ const exec = require('child_process').exec
 
 function executeCommand(event, command) {
     console.log(command)
-    exec(command)
+    const child = exec(command)
+    console.log(child.pid)
+    // 如果需要获取pid的话
+    // setTimeout(() => {
+    //     exec('tasklist /fi "imagename eq notepad.exe" /fo csv /nh', (error, stdout, stderr) => {
+    //         if (error) {
+    //             console.error(`tasklist error: ${error}`);
+    //             return;
+    //         }
+    //         const lines = stdout.trim().split('\n');
+    //         const pids = lines.map(line => line.split(',')[1].replace(/"/g, ''));
+    //         const notepadPid = pids[pids.length - 1]; // 取最后一个 notepad 的 PID
+    //         console.log(`Notepad PID: ${notepadPid}`);
+    //     });
+    // }, 1000);
 }
 
 function createWindow() {
