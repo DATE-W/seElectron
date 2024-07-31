@@ -22,13 +22,13 @@
                     <PauseCircleOutlined />结束仿真
                 </a-button>
                 <a-button :disabled="!simuStarted" type="text" style="margin-left: -1vh" @click="runSimulation">
-                    <PlayCircleOutlined />运行
+                    <PlayCircleOutlined />编译仿真工程
                 </a-button>
                 <a-button :disabled="!simuStarted" type="text" style="margin-left: -1vh" @click="stopSimulation">
-                    <PauseCircleOutlined />终止
+                    <PauseCircleOutlined />运行仿真工程
                 </a-button>
-                <a-button type="text" style="margin-left: -1vh">
-                    <CloudUploadOutlined />导出
+                <a-button type="text" style="margin-left: -1vh" @click="codeGenerate">
+                    <CloudUploadOutlined />仿真工程代码生成
                 </a-button>
             </div>
             <div style="margin-right: 10px">
@@ -223,7 +223,13 @@ function runSimulation() {
 }
 
 function stopSimulation() {
+    window.electronAPI.executeCommand("notepad")
     console.log("终止仿真")
+}
+
+function codeGenerate() {
+    const folderPath = 'D:\\sthgithub\\seElectron';
+    window.electronAPI.openFileExplorer(folderPath);
 }
 
 const processParallelEdgesOnAnchorPoint = (

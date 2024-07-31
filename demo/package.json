@@ -9,7 +9,8 @@
     "serve": "vite preview",
     "electron": "wait-on tcp:5173 && cross-env NODE_ENV=development electron .",
     "electron:serve": "concurrently -k \"npm run dev\" \"npm run electron\"",
-    "electron:build": "vite build && electron-builder"
+    "electron:build": "vite build && electron-builder",
+    "make": "vite build && electron-builder --win --ia32"
   },
   "build": {
     "appId": "com.dweb.demo",
@@ -29,6 +30,17 @@
     "directories": {
       "buildResources": "assets",
       "output": "dist_electron"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "ia32",
+            "x64"
+          ]
+        }
+      ]
     }
   },
   "dependencies": {
@@ -41,7 +53,7 @@
     "@vitejs/plugin-vue": "^5.0.3",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
-    "electron": "^22.1.0",
+    "electron": "^22.3.27",
     "electron-builder": "^24.13.3",
     "unplugin-auto-import": "^0.17.5",
     "unplugin-vue-components": "^0.26.0",
