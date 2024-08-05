@@ -867,7 +867,8 @@ function initGraph() {
             // },
         },
         defaultEdge: {
-            type: 'quadratic',
+            // type: 'quadratic',
+            type: 'line',
             style: {
                 stroke: '#e2e2e2',
                 lineWidth: 2,
