@@ -230,9 +230,6 @@ function stopSimulation() {
 function codeGenerate() {
     const folderPath = 'D:\\sthgithub\\seElectron';
     window.electronAPI.openFileExplorer(folderPath);
-    // const folderPath = '..';
-    // window.electronAPI.openFileExplorer(folderPath);
-    window.electronAPI.executeCommand("explorer .")
 }
 
 const processParallelEdgesOnAnchorPoint = (
@@ -870,17 +867,11 @@ function initGraph() {
             // },
         },
         defaultEdge: {
-<<<<<<< Updated upstream
             // type: 'quadratic',
             type: 'line',
-=======
-            type: 'linear',
->>>>>>> Stashed changes
             style: {
-                stroke: '#e2e2e2',
-                lineWidth: 2,
                 stroke: '#1f1f1f',
-                lineWidth: 1,
+                lineWidth: 2,
                 endArrow: {
                     path: G6.Arrow.vee(5, 10, 10),
                     d: 10,
