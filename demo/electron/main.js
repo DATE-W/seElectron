@@ -21,22 +21,17 @@ async function fileOpen() {
 const exec = require('child_process').exec
 
 function executeCommand(event, command) {
-    console.log(command)
-    const child = exec(command)
-    console.log(child.pid)
-    // 如果需要获取pid的话
-    // setTimeout(() => {
-    //     exec('tasklist /fi "imagename eq notepad.exe" /fo csv /nh', (error, stdout, stderr) => {
-    //         if (error) {
-    //             console.error(`tasklist error: ${error}`);
-    //             return;
-    //         }
-    //         const lines = stdout.trim().split('\n');
-    //         const pids = lines.map(line => line.split(',')[1].replace(/"/g, ''));
-    //         const notepadPid = pids[pids.length - 1]; // 取最后一个 notepad 的 PID
-    //         console.log(`Notepad PID: ${notepadPid}`);
-    //     });
-    // }, 1000);
+    // const str = 'E:\\vs\\VC\\Auxiliary\\Build\\vcvarsall.bat x64\ncl /Fe:\"C:/Users/13293/Desktop/\" /EHsc C:/Users/13293/Desktop/1.cpp\n'
+    // 注意这里路径是写死的，这个vcvarsall.bat的位置在vs安装路径下/VC/Auxiliary/Build/，我的建议是软件加一个能初始化vs工具路径的东西
+    const child = exec('E:\\vs\\VC\\Auxiliary\\Build\\vcvarsall.bat x64 && cl /Fe:\"C:/Users/13293/Desktop/\" /EHsc C:/Users/13293/Desktop/1.cpp', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+            return;
+        }
+        console.log(`stdout: ${stdout}`);
+        console.error(`stderr: ${stderr}`);
+    })
+    console.log(str)
 }
 
 function createWindow() {
