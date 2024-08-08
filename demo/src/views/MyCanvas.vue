@@ -38,7 +38,7 @@
 
         </a-flex>
         <div style="display:flex;">
-            <div id="shape-selector" style="width: 20vw; height: 90vh; border: 0px solid #ccc; padding-left: 0.5vw;
+            <div id="shape-selector" style="width: 20%; height: 60%; border: 0px solid #ccc; padding-left: 0.5vw;
                 display:block; flex-direction:column; justify-items:center; align-items:center">
                 <!-- <div v-for="(category, index) in categories" :key="index" style="margin-bottom: 20px;">
                   <h3>{{ category.categoryName }}</h3>
@@ -166,9 +166,26 @@
             </div>
             <!--画布-->
             <div class="parent-canvas" ref="parent-canvas">
-                <div id="container" ref="container"></div>
+                <div id="container" ref="container" style="width: 80%; height: 80%;"></div>
             </div>
-
+        </div>
+        
+        <!-- 终端输出框 -->
+        <div class="terminal-container">
+            <div class="terminal-header">
+                <a-button type="text" @click="codeGenerate">
+                    <PlayCircleOutlined />仿真工程代码生成
+                </a-button>
+                <a-button type="text" @click="runSimulation">
+                    <PlayCircleOutlined />仿真工程编译
+                </a-button>
+                <a-button type="text" @click="downloadRunSimulation">
+                    <DownloadOutlined />仿真工程下载与启动
+                </a-button>
+            </div>
+            <div class="terminal-output">
+                <pre>{{ terminalOutput }}</pre>
+            </div>
         </div>
     </div>
 
@@ -221,18 +238,27 @@ let count = 0;
 let resCount = 0;
 const simuStarted = ref(false)
 
+const terminalOutput = ref('初始化完成')
+function printToTerminal(message) {
+    terminalOutput.value += '\n' + message 
+}
+
 function runSimulation() {
+    printToTerminal('仿真工程编译开始...')
     window.electronAPI.executeCommand("notepad")
+    printToTerminal('编译成功，开始仿真...')
 }
 
 function downloadRunSimulation() {
     window.electronAPI.executeCommand("notepad")
     console.log("仿真工程下载与启动")
+    printToTerminal('仿真工程下载与启动')
 }
 
 function codeGenerate() {
     const folderPath = 'D:\\sthgithub\\seElectron';
     window.electronAPI.openFileExplorer(folderPath);
+    printToTerminal('代码生成成功');
 }
 
 const processParallelEdgesOnAnchorPoint = (
@@ -1245,5 +1271,34 @@ function loadGraphFromData(data) {
     flex-grow: 1;
     min-height: 90vh;
     border: 1px solid #fff;
+}
+
+.terminal-container {
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0px;
+    background-color: #ccc;
+    color: #fff;
+}
+
+.terminal-header {
+    display: flex;
+    justify-content: left;
+    margin-bottom: 0px;
+}
+
+.terminal-output {
+    background-color: #000;
+    padding: 10px;
+    border-radius: 5px;
+    height: 200px;
+    overflow-y: auto;
+}
+
+pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 </style>
