@@ -13,22 +13,21 @@
                 <a-button type="text" style="margin-left: -1vh">
                     <MinusCircleOutlined />缩小
                 </a-button>
-                <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh"
-                    @click="() => { simuStarted = true }">
-                    <PlayCircleOutlined />开始仿真
+                <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh" @click="codeGenerate">
+                    <PlayCircleOutlined />仿真工程代码生成
                 </a-button>
-                <a-button v-show="simuStarted" type="text" style="margin-left: -1vh"
-                    @click="() => { simuStarted = false }">
-                    <PauseCircleOutlined />结束仿真
+                <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh" @click="runSimulation">
+                    <PlayCircleOutlined />仿真工程编译
                 </a-button>
-                <a-button :disabled="!simuStarted" type="text" style="margin-left: -1vh" @click="runSimulation">
-                    <PlayCircleOutlined />编译仿真工程
+                <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh" @click="() => { simuStarted = true }">
+                    <SettingOutlined />仿真运行配置
                 </a-button>
-                <a-button :disabled="!simuStarted" type="text" style="margin-left: -1vh" @click="stopSimulation">
-                    <PauseCircleOutlined />运行仿真工程
+
+                <a-button v-show="simuStarted" type="text" style="margin-left: -1vh" @click="downloadRunSimulation">
+                    <DownloadOutlined />仿真工程下载与启动
                 </a-button>
-                <a-button type="text" style="margin-left: -1vh" @click="codeGenerate">
-                    <CloudUploadOutlined />仿真工程代码生成
+                <a-button v-show="simuStarted" type="text" style="margin-left: -1vh" @click="() => { simuStarted = false }">
+                    <EditOutlined />仿真工程编辑
                 </a-button>
             </div>
             <div style="margin-right: 10px">
@@ -172,6 +171,7 @@
 
         </div>
     </div>
+
     <!-- <div>
         <button @click="saveGraph">SAVE</button>
         <input id="LdGf" type="file" ref="fileInput" @change="loadGraph">
@@ -194,7 +194,10 @@ import {
     PlayCircleOutlined,
     PauseCircleOutlined,
     AlignLeftOutlined,
-    BorderOuterOutlined
+    BorderOuterOutlined,
+    DownloadOutlined,
+    EditOutlined,
+    SettingOutlined,
 } from '@ant-design/icons-vue';
 
 window.electronAPI.onSaveGraph((value) => {
@@ -222,9 +225,9 @@ function runSimulation() {
     window.electronAPI.executeCommand("notepad")
 }
 
-function stopSimulation() {
+function downloadRunSimulation() {
     window.electronAPI.executeCommand("notepad")
-    console.log("终止仿真")
+    console.log("仿真工程下载与启动")
 }
 
 function codeGenerate() {
