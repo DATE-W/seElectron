@@ -20,18 +20,17 @@ async function fileOpen() {
 }
 const exec = require('child_process').exec
 
-function executeCommand(event, command) {
-    // const str = 'E:\\vs\\VC\\Auxiliary\\Build\\vcvarsall.bat x64\ncl /Fe:\"C:/Users/13293/Desktop/\" /EHsc C:/Users/13293/Desktop/1.cpp\n'
-    // 注意这里路径是写死的，这个vcvarsall.bat的位置在vs安装路径下/VC/Auxiliary/Build/，我的建议是软件加一个能初始化vs工具路径的东西
-    const child = exec('E:\\vs\\VC\\Auxiliary\\Build\\vcvarsall.bat x64 && cl /Fe:\"C:/Users/13293/Desktop/\" /EHsc C:/Users/13293/Desktop/1.cpp', (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-            return;
+function executeCommand(event, command, noexcept = true) {
+    const child = exec(command, (error, stdout, stderr) => {
+        if (!noexcept) {
+            if (error) {
+                console.error(`exec error: ${error}`);
+                return;
+            }
+            console.log(`stdout: ${stdout}`);
+            console.error(`stderr: ${stderr}`);
         }
-        console.log(`stdout: ${stdout}`);
-        console.error(`stderr: ${stderr}`);
     })
-    console.log(str)
 }
 
 function createWindow() {

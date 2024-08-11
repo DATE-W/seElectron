@@ -19,14 +19,16 @@
                 <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh" @click="runSimulation">
                     <PlayCircleOutlined />仿真工程编译
                 </a-button>
-                <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh" @click="() => { simuStarted = true }">
+                <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh"
+                    @click="() => { simuStarted = true }">
                     <SettingOutlined />仿真运行配置
                 </a-button>
 
                 <a-button v-show="simuStarted" type="text" style="margin-left: -1vh" @click="downloadRunSimulation">
                     <DownloadOutlined />仿真工程下载与启动
                 </a-button>
-                <a-button v-show="simuStarted" type="text" style="margin-left: -1vh" @click="() => { simuStarted = false }">
+                <a-button v-show="simuStarted" type="text" style="margin-left: -1vh"
+                    @click="() => { simuStarted = false }">
                     <EditOutlined />仿真工程编辑
                 </a-button>
             </div>
@@ -169,7 +171,7 @@
                 <div id="container" ref="container" style="width: 80%; height: 80%;"></div>
             </div>
         </div>
-        
+
         <!-- 终端输出框 -->
         <div class="terminal-container">
             <div class="terminal-header">
@@ -240,12 +242,13 @@ const simuStarted = ref(false)
 
 const terminalOutput = ref('初始化完成')
 function printToTerminal(message) {
-    terminalOutput.value += '\n' + message 
+    terminalOutput.value += '\n' + message
 }
 
 function runSimulation() {
     printToTerminal('仿真工程编译开始...')
-    window.electronAPI.executeCommand("notepad")
+    // 注意这里路径是写死的，这个vcvarsall.bat的位置在vs安装路径下/VC/Auxiliary/Build/
+    window.electronAPI.executeCommand('E:\\vs\\VC\\Auxiliary\\Build\\vcvarsall.bat x64 && MSBuild ./public/hello/hello.sln /t:rebuild /p:Platform=x64')
     printToTerminal('编译成功，开始仿真...')
 }
 
