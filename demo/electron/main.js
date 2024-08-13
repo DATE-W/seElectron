@@ -124,10 +124,12 @@ function createWindow() {
 // 部分 API 在 ready 事件触发后才能使用。
 app.whenReady().then(() => {
     ipcMain.handle('dialog:openFile', fileOpen)
+    ipcMain.handle('dialog:openDirectory ', handleFileOpen)
     ipcMain.on('executeCommand', executeCommand)
     ipcMain.on('openFileExplorer', (event, folderPath) => {
         shell.openPath(folderPath);
     });
+
     createWindow()
     app.on('activate', function () {
         // 通常在 macOS 上，当点击 dock 中的应用程序图标时，如果没有其他
@@ -143,3 +145,13 @@ app.whenReady().then(() => {
 app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') app.quit()
 })
+
+
+async function handleFileOpen () {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+        properties: ['openDirectory']
+    })
+    if (!canceled) {
+      return filePaths[0]
+    }
+}

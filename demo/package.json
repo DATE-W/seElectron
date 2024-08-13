@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "@ant-design/icons-vue": "^7.0.1",
+    "@electron/remote": "^2.1.2",
     "ant-design-vue": "^4.2.3",
     "element-plus": "^2.6.1"
   },

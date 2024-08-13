@@ -20,6 +20,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onNewClass: (callback) => ipcRenderer.on('NewClass', (_event, value) => callback(value)),
     openFile: () => ipcRenderer.invoke('dialog:openFile'),
     openFileExplorer: (folderPath) => ipcRenderer.send('openFileExplorer', folderPath),
+    chooseFilePath: () => ipcRenderer.invoke('dialog:openDirectory'),
     executeCommand: (command) => {
         ipcRenderer.send('executeCommand', command)
     }

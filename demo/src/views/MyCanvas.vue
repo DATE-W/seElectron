@@ -162,8 +162,25 @@
                                 <el-button @click="modifyGroupInfo = false">取 消</el-button>
                             </el-form-item>
                         </el-form>
-
                     </el-dialog>
+                    <el-dialog v-model="codeGenChoosePath" title="选择文件路径">
+                        <el-form :model="fileFolderPath" label-width="100px" :rule="fileFolderPathRules">
+                        <el-form-item label="源文件夹" prop="sourcePath">
+                            <el-input v-model="fileFolderPath.sourcePath" placeholder="请选择源文件夹" readonly></el-input>
+                            <el-button @click="selectFolder('source')">选择源文件夹</el-button>
+                        </el-form-item>
+                        <el-form-item label="目标文件夹" prop="destinationPath">
+                            <el-input v-model="fileFolderPath.destinationPath" placeholder="请选择目标文件夹" readonly></el-input>
+                            <el-button @click="selectFolder('destination')">选择目标文件夹</el-button>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="savePath">保存</el-button>
+                            <el-button @click="dialogVisible = false">取消</el-button>
+                        </el-form-item>
+                        </el-form>
+                    </el-dialog>
+                        
+                    
                 </div>
             </div>
             <!--画布-->
@@ -259,8 +276,11 @@ function downloadRunSimulation() {
 }
 
 function codeGenerate() {
-    const folderPath = 'D:\\sthgithub\\seElectron';
-    window.electronAPI.openFileExplorer(folderPath);
+    codeGenChoosePath.value = true;
+    console.log(codeGenChoosePath.value)
+    // const folderPath = 'D:\\nt\\t2';
+    // window.electronAPI.executeCommand("xcopy D:\\nt\\t1 D:\\nt\\t2 /s /e");
+    // window.electronAPI.openFileExplorer(folderPath);
     printToTerminal('代码生成成功');
 }
 
@@ -1242,6 +1262,30 @@ function loadGraphFromData(data) {
         console.error(error);
     }
 }
+
+let codeGenChoosePath = ref(false);
+let fileFolderPath = ref({
+    sourcePath: "",
+    destinationPath: ""
+})
+const fileFolderPathRules = reactive({
+    sourcePath: [
+        { trigger: 'blur', required: true }
+    ],
+    destinationPath: [
+        { trigger: 'blur', required: true }
+    ]
+})
+
+const selectFolder = async (type) => {
+    const filePath = await window.electronAPI.chooseFilePath();
+    console.log(filePath)
+};
+
+const savePath = () => {
+    // 这里可以添加保存路径的逻辑
+    codeGenChoosePath.value = false;
+};
 
 </script>
 
