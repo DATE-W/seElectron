@@ -163,19 +163,19 @@
                             </el-form-item>
                         </el-form>
                     </el-dialog>
-                    <el-dialog v-model="codeGenChoosePath" title="选择文件路径">
+                    <el-dialog v-model="codeGenChoosePath" title="选择文件路径" :show-close="false">
                         <el-form :model="fileFolderPath" label-width="100px" :rule="fileFolderPathRules">
-                        <el-form-item label="源文件夹" prop="sourcePath">
-                            <el-input v-model="fileFolderPath.sourcePath" placeholder="请选择源文件夹" readonly></el-input>
-                            <el-button @click="selectFolder('source')">选择源文件夹</el-button>
-                        </el-form-item>
+                        <!--                        <el-form-item label="源文件夹" prop="sourcePath">
+                            {{ fileFolderPath.sourcePath }}
+                            <el-button @click="selectSourceFolder">选择源文件夹</el-button>
+                        </el-form-item>-->
                         <el-form-item label="目标文件夹" prop="destinationPath">
-                            <el-input v-model="fileFolderPath.destinationPath" placeholder="请选择目标文件夹" readonly></el-input>
-                            <el-button @click="selectFolder('destination')">选择目标文件夹</el-button>
+                            {{ fileFolderPath.destinationPath }}
+                            <el-button @click="selectDestinationFolder">选择目标文件夹</el-button>
                         </el-form-item>
                         <el-form-item>
-                            <el-button type="primary" @click="savePath">保存</el-button>
-                            <el-button @click="dialogVisible = false">取消</el-button>
+                            <el-button type="primary" @click="beginGenerate">生成</el-button>
+                            <el-button @click="cancelPathChoose">取消</el-button>
                         </el-form-item>
                         </el-form>
                     </el-dialog>
@@ -278,10 +278,9 @@ function downloadRunSimulation() {
 function codeGenerate() {
     codeGenChoosePath.value = true;
     console.log(codeGenChoosePath.value)
-    // const folderPath = 'D:\\nt\\t2';
+    // const copyCmd = 'xcopy' + fileFolderPath;
     // window.electronAPI.executeCommand("xcopy D:\\nt\\t1 D:\\nt\\t2 /s /e");
     // window.electronAPI.openFileExplorer(folderPath);
-    printToTerminal('代码生成成功');
 }
 
 const processParallelEdgesOnAnchorPoint = (
@@ -1265,7 +1264,7 @@ function loadGraphFromData(data) {
 
 let codeGenChoosePath = ref(false);
 let fileFolderPath = ref({
-    sourcePath: "",
+    sourcePath: "D:\\nt\\t1",
     destinationPath: ""
 })
 const fileFolderPathRules = reactive({
@@ -1277,14 +1276,37 @@ const fileFolderPathRules = reactive({
     ]
 })
 
-const selectFolder = async (type) => {
+async function selectSourceFolder() {
+    fileFolderPath.value.sourcePath = await selectFolder();
+    console.log("sourcePath:" +  fileFolderPath.value.sourcePath);
+}
+
+async function selectDestinationFolder() {
+    fileFolderPath.value.destinationPath = await selectFolder();
+    console.log("destinationPath:" +  fileFolderPath.value.destinationPath);
+}
+
+const selectFolder = async () => {
     const filePath = await window.electronAPI.chooseFilePath();
-    console.log(filePath)
+    console.log(filePath);
+    return filePath;
 };
 
-const savePath = () => {
+const beginGenerate = () => {
+    codeGenChoosePath.value = false;
+    const copyCmd = `xcopy ${fileFolderPath.value.sourcePath} ${fileFolderPath.value.destinationPath} /s /e`;
+    window.electronAPI.executeCommand(copyCmd);
+    window.electronAPI.openFileExplorer(fileFolderPath.value.destinationPath);
+    //fileFolderPath.value.sourcePath = "";
+    fileFolderPath.value.destinationPath = "";
+    printToTerminal('代码生成成功');
+}
+
+const cancelPathChoose = () => {
     // 这里可以添加保存路径的逻辑
     codeGenChoosePath.value = false;
+    //fileFolderPath.value.sourcePath = "";
+    fileFolderPath.value.destinationPath = "";
 };
 
 </script>
