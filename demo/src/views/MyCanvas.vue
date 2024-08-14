@@ -165,22 +165,22 @@
                     </el-dialog>
                     <el-dialog v-model="codeGenChoosePath" title="选择文件路径" :show-close="false">
                         <el-form :model="fileFolderPath" label-width="100px" :rule="fileFolderPathRules">
-                        <!--                        <el-form-item label="源文件夹" prop="sourcePath">
+                            <!--                        <el-form-item label="源文件夹" prop="sourcePath">
                             {{ fileFolderPath.sourcePath }}
                             <el-button @click="selectSourceFolder">选择源文件夹</el-button>
                         </el-form-item>-->
-                        <el-form-item label="目标文件夹" prop="destinationPath">
-                            {{ fileFolderPath.destinationPath }}
-                            <el-button @click="selectDestinationFolder">选择目标文件夹</el-button>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button type="primary" @click="beginGenerate">生成</el-button>
-                            <el-button @click="cancelPathChoose">取消</el-button>
-                        </el-form-item>
+                            <el-form-item label="目标文件夹" prop="destinationPath">
+                                {{ fileFolderPath.destinationPath }}
+                                <el-button @click="selectDestinationFolder">选择目标文件夹</el-button>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="beginGenerate">生成</el-button>
+                                <el-button @click="cancelPathChoose">取消</el-button>
+                            </el-form-item>
                         </el-form>
                     </el-dialog>
-                        
-                    
+
+
                 </div>
             </div>
             <!--画布-->
@@ -265,7 +265,7 @@ function printToTerminal(message) {
 function runSimulation() {
     printToTerminal('仿真工程编译开始...')
     // 注意这里路径是写死的，这个vcvarsall.bat的位置在vs安装路径下/VC/Auxiliary/Build/
-    window.electronAPI.executeCommand('E:\\vs\\VC\\Auxiliary\\Build\\vcvarsall.bat x64 && MSBuild ./public/hello/hello.sln /t:rebuild /p:Platform=x64')
+    window.electronAPI.executeCommand('vcvarsall.bat x64 && MSBuild ./public/code/CodeDemo_RTX.sln /t:rebuild /p:Platform=x64 /p:Configuration=RtssRelease')
     printToTerminal('编译成功，开始仿真...')
 }
 
@@ -1264,7 +1264,7 @@ function loadGraphFromData(data) {
 
 let codeGenChoosePath = ref(false);
 let fileFolderPath = ref({
-    sourcePath: "D:\\nt\\t1",
+    sourcePath: "../public/hello",
     destinationPath: ""
 })
 const fileFolderPathRules = reactive({
@@ -1278,12 +1278,12 @@ const fileFolderPathRules = reactive({
 
 async function selectSourceFolder() {
     fileFolderPath.value.sourcePath = await selectFolder();
-    console.log("sourcePath:" +  fileFolderPath.value.sourcePath);
+    console.log("sourcePath:" + fileFolderPath.value.sourcePath);
 }
 
 async function selectDestinationFolder() {
     fileFolderPath.value.destinationPath = await selectFolder();
-    console.log("destinationPath:" +  fileFolderPath.value.destinationPath);
+    console.log("destinationPath:" + fileFolderPath.value.destinationPath);
 }
 
 const selectFolder = async () => {
@@ -1294,7 +1294,7 @@ const selectFolder = async () => {
 
 const beginGenerate = () => {
     codeGenChoosePath.value = false;
-    const copyCmd = `xcopy ${fileFolderPath.value.sourcePath} ${fileFolderPath.value.destinationPath} /s /e`;
+    const copyCmd = `xcopy "${fileFolderPath.value.sourcePath}" "${fileFolderPath.value.destinationPath}" /s /e`;
     window.electronAPI.executeCommand(copyCmd);
     window.electronAPI.openFileExplorer(fileFolderPath.value.destinationPath);
     //fileFolderPath.value.sourcePath = "";

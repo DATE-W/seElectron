@@ -21,7 +21,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     openFile: () => ipcRenderer.invoke('dialog:openFile'),
     chooseFilePath: () => ipcRenderer.invoke('dialog:openDirectory'),
     openFileExplorer: (folderPath) => ipcRenderer.send('openFileExplorer', folderPath),
-    executeCommand: (command) => {
-        ipcRenderer.send('executeCommand', command)
-    }
+    executeCommand: (command) => ipcRenderer.send('executeCommand', command)
+
 })
