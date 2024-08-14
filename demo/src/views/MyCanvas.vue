@@ -265,7 +265,7 @@ function printToTerminal(message) {
 function runSimulation() {
     printToTerminal('仿真工程编译开始...')
     // 注意这里路径是写死的，这个vcvarsall.bat的位置在vs安装路径下/VC/Auxiliary/Build/
-    window.electronAPI.executeCommand('vcvarsall.bat x64 && MSBuild ./public/code/CodeDemo_RTX.sln /t:rebuild /p:Platform=x64 /p:Configuration=RtssRelease')
+    window.electronAPI.executeCommand('vcvarsall.bat x64 && MSBuild ./resources/public/code/CodeDemo_RTX.sln /t:rebuild /p:Platform=x64 /p:Configuration=RtssRelease')
     printToTerminal('编译成功，开始仿真...')
 }
 
@@ -1264,7 +1264,7 @@ function loadGraphFromData(data) {
 
 let codeGenChoosePath = ref(false);
 let fileFolderPath = ref({
-    sourcePath: "../public/hello",
+    sourcePath: ".\\resources\\public\\code",
     destinationPath: ""
 })
 const fileFolderPathRules = reactive({
@@ -1295,6 +1295,7 @@ const selectFolder = async () => {
 const beginGenerate = () => {
     codeGenChoosePath.value = false;
     const copyCmd = `xcopy "${fileFolderPath.value.sourcePath}" "${fileFolderPath.value.destinationPath}" /s /e`;
+    console.log(copyCmd)
     window.electronAPI.executeCommand(copyCmd);
     window.electronAPI.openFileExplorer(fileFolderPath.value.destinationPath);
     //fileFolderPath.value.sourcePath = "";
