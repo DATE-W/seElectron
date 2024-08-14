@@ -18,6 +18,16 @@ async function fileOpen() {
         })
     }
 }
+
+async function handleFileOpen () {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+        properties: ['openDirectory']
+    })
+    if (!canceled) {
+        return filePaths[0]
+    }
+}
+
 const exec = require('child_process').exec
 
 function executeCommand(event, command, noexcept = true) {
@@ -124,7 +134,7 @@ function createWindow() {
 // 部分 API 在 ready 事件触发后才能使用。
 app.whenReady().then(() => {
     ipcMain.handle('dialog:openFile', fileOpen)
-    ipcMain.handle('dialog:openDirectory ', handleFileOpen)
+    ipcMain.handle('dialog:openDirectory', handleFileOpen)
     ipcMain.on('executeCommand', executeCommand)
     ipcMain.on('openFileExplorer', (event, folderPath) => {
         shell.openPath(folderPath);
@@ -147,11 +157,3 @@ app.on('window-all-closed', function () {
 })
 
 
-async function handleFileOpen () {
-    const { canceled, filePaths } = await dialog.showOpenDialog({
-        properties: ['openDirectory']
-    })
-    if (!canceled) {
-      return filePaths[0]
-    }
-}
