@@ -52,7 +52,7 @@
               </div> -->
                 <el-menu>
                     <template v-for="(category, index) in categories" :key="index">
-                        <el-sub-menu v-show="!simuStarted" v-if="category.categoryName != '仿真资源'">
+                        <el-sub-menu v-show="!simuStarted" v-if="category.categoryName != '仿真资源'" :index="`${index}`">
                             <!-- <h3>{{ category.categoryName }}</h3> -->
                             <template v-slot:title>
                                 <BorderOuterOutlined style="margin-right: 0.5vh" />
@@ -68,6 +68,8 @@
                                 </el-menu-item>
                             </div>
                         </el-sub-menu>
+                    </template>
+                    <template v-for="(category, index) in categories" :key="index">
                         <el-sub-menu v-show="simuStarted" v-if="category.categoryName == '仿真资源'">
                             <template v-slot:title>
                                 <BorderOuterOutlined style="margin-right: 0.5vh" />
