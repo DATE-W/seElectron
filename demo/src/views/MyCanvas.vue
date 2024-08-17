@@ -24,6 +24,15 @@
                     <SettingOutlined />仿真运行配置
                 </a-button>
 
+                <!-- <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh"
+                    @click="loadGraph">
+                    <CloudUploadOutlined />仿真工程加载
+                </a-button>
+                <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh"
+                    @click="saveGraph">
+                    <CloudDownloadOutlined />仿真工程保存
+                </a-button> -->
+
                 <a-button v-show="simuStarted" type="text" style="margin-left: -1vh" @click="downloadRunSimulation">
                     <DownloadOutlined />仿真工程下载与启动
                 </a-button>
@@ -210,13 +219,6 @@
         </div>
     </div>
 
-    <!-- <div>
-        <button @click="saveGraph">SAVE</button>
-        <input id="LdGf" type="file" ref="fileInput" @change="loadGraph">
-    </div>
-    <div v-show="selectedItem" v-if="selectedItem">
-        <attrWindow id="attrWindow1" style="width:500px" :item="selectedItem" @update="handleUpdate" />
-    </div> -->
 </template>
 
 <script setup name="GraphEditor">
@@ -236,6 +238,7 @@ import {
     DownloadOutlined,
     EditOutlined,
     SettingOutlined,
+    CloudDownloadOutlined,
 } from '@ant-design/icons-vue';
 
 window.electronAPI.onSaveGraph((value) => {
@@ -1173,6 +1176,7 @@ function updateGraph() {
 }
 
 function saveGraph() {
+    console.log(graph.value.data)
     // 将数据组合成一个对象
     const jsonData = {
         // count:count,
@@ -1237,11 +1241,26 @@ function loadGraph(event) {
 function loadGraphFromData(data) {
 
     try {
+        // console.log(data)
         count = 0
         classes = data.classesData
         categories.value.find(item => item.categoryName == "自定义类").models.length = 0
+        // 左边加载自定义类
         classes.forEach(cla => {
-            if (cla.category == 2) {
+            // group
+            if (cla.category == 0) {
+
+            }
+            // 模型
+            else if (cla.category == 1) {
+
+            }
+            // 资源
+            else if (cla.category == 2) {
+
+            }
+            // 自定义类
+            else if (cla.category == 3) {
                 categories.value.find(item => item.categoryName == "自定义类").models.push({
                     class_name: cla.class_name,
                     description: `矩形-${cla.input_num}-${cla.output_num}-(${cla.class_name})`,
@@ -1252,11 +1271,12 @@ function loadGraphFromData(data) {
 
         let registered = data.registerData
         registered.forEach(node => {
-            register(node.input_num, node.output_num, node.input_params, node.output_params)
+            register(node.input_num, node.output_num, node.input_params, node.output_params, node.class_name)
         })
 
         edges.value = data.graphData.edges
         nodes.value = data.graphData.nodes
+        groups.value = data.graphData.combos
         updateGraph()
     }
     catch (error) {
