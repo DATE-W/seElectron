@@ -52,7 +52,7 @@ function createWindow() {
             preload: path.join(__dirname, 'preload.js')
         },
         icon: path.join(__dirname, '../public/tju.png'),
-        title: '新建项目',
+        title: 'DevTool',
         webPreferences: {
             preload: path.join(__dirname, 'preload.js')
         }

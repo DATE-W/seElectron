@@ -7,7 +7,13 @@
         <!-- 功能区-->
         <a-flex justify="space-between" align="flex-start">
             <div>
-                <a-button type="text">
+                <a-button type="text" @click="loadGraph">
+                    <UploadOutlined />加载
+                </a-button>
+                <a-button type="text" style="margin-left: -1vh" @click="saveGraph">
+                    <DownloadOutlined />下载
+                </a-button>
+                <a-button type="text" style="margin-left: -1vh">
                     <PlusCircleOutlined />放大
                 </a-button>
                 <a-button type="text" style="margin-left: -1vh">
@@ -236,6 +242,7 @@ import {
     AlignLeftOutlined,
     BorderOuterOutlined,
     DownloadOutlined,
+    UploadOutlined,
     EditOutlined,
     SettingOutlined,
     CloudDownloadOutlined,
@@ -1201,41 +1208,46 @@ function saveGraph() {
     console.log('save')
 }
 
-function loadGraph(event) {
-    const file = event.target.files[0]; // 获取用户选择的文件
-    if (!file) return;
-    const reader = new FileReader(); // 创建一个FileReader对象
-    reader.onload = () => {
-        try {
-            const data = JSON.parse(reader.result); // 读取文件内容并解析为 JSON
-            console.log("Load:", file)
-            count = 0
-            classes = data.classesData
-            categories.value.find(item => item.categoryName == "自定义类").models.length = 0
-            classes.forEach(cla => {
-                if (cla.category == 2) {
-                    categories.value.find(item => item.categoryName == "自定义类").models.push({
-                        class_name: cla.class_name,
-                        description: `矩形-${cla.input_num}-${cla.output_num}-(${cla.class_name})`,
-                        color: "#fff"
-                    })
-                }
-            })
+// function loadGraph(event) {
+//     const file = event.target.files[0]; // 获取用户选择的文件
+//     if (!file) return;
+//     const reader = new FileReader(); // 创建一个FileReader对象
+//     reader.onload = () => {
+//         try {
+//             const data = JSON.parse(reader.result); // 读取文件内容并解析为 JSON
+//             console.log("Load:", file)
+//             count = 0
+//             classes = data.classesData
+//             categories.value.find(item => item.categoryName == "自定义类").models.length = 0
+//             classes.forEach(cla => {
+//                 if (cla.category == 2) {
+//                     categories.value.find(item => item.categoryName == "自定义类").models.push({
+//                         class_name: cla.class_name,
+//                         description: `矩形-${cla.input_num}-${cla.output_num}-(${cla.class_name})`,
+//                         color: "#fff"
+//                     })
+//                 }
+//             })
 
-            let registered = data.registerData
-            registered.forEach(node => {
-                register(node.input_num, node.output_num, node.input_params, node.output_params)
-            })
+//             let registered = data.registerData
+//             registered.forEach(node => {
+//                 register(node.input_num, node.output_num, node.input_params, node.output_params)
+//             })
 
-            edges.value = data.graphData.edges
-            nodes.value = data.graphData.nodes
-            updateGraph()
-        } catch (error) {
-            console.error(error);
-        }
-    };
+//             edges.value = data.graphData.edges
+//             nodes.value = data.graphData.nodes
+//             updateGraph()
+//         } catch (error) {
+//             console.error(error);
+//         }
+//     };
 
-    reader.readAsText(file); // 以文本形式读取文件内容
+//     reader.readAsText(file); // 以文本形式读取文件内容
+// }
+async function loadGraph() {
+    const dt = await window.electronAPI.openFile()
+    const data = JSON.parse(dt)
+    loadGraphFromData(data)
 }
 
 function loadGraphFromData(data) {
