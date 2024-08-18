@@ -18,6 +18,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onSaveGraph: (callback) => ipcRenderer.on('SaveGraph', (_event, value) => callback(value)),
     onLoadGraph: (callback) => ipcRenderer.on('LoadGraph', (_event, value) => callback(value)),
     onNewClass: (callback) => ipcRenderer.on('NewClass', (_event, value) => callback(value)),
+    onNewCanvas: (callback) => ipcRenderer.on('NewCanvas', (_event, value) => callback(value)),
     openFile: () => ipcRenderer.invoke('dialog:openFile'),
     chooseFilePath: () => ipcRenderer.invoke('dialog:openDirectory'),
     openFileExplorer: (folderPath) => ipcRenderer.send('openFileExplorer', folderPath),

@@ -19,7 +19,7 @@ async function fileOpen() {
     }
 }
 
-async function handleFileOpen () {
+async function handleFileOpen() {
     const { canceled, filePaths } = await dialog.showOpenDialog({
         properties: ['openDirectory']
     })
@@ -76,10 +76,13 @@ function createWindow() {
         label: '项目',
         submenu: [
             {
-                label: '关闭',
-                accelerator: process.platform === 'darwin' ? 'Alt+Cmd+Q' : 'Alt+Shift+Q',
+                type: 'separator',
+            },
+            {
+                label: '新建',
+                accelerator: process.platform === 'darwin' ? 'Alt+Cmd+N' : 'Alt+Shift+N',
                 click: () => {
-                    mainWindow.close();
+                    mainWindow.webContents.send('NewCanvas');
                 }
             },
             {
@@ -100,6 +103,16 @@ function createWindow() {
                 accelerator: process.platform === 'darwin' ? 'Alt+Cmd+L' : 'Alt+Shift+L',
                 click: () => {
                     mainWindow.webContents.send('LoadGraph');
+                }
+            },
+            {
+                type: 'separator',
+            },
+            {
+                label: '关闭',
+                accelerator: process.platform === 'darwin' ? 'Alt+Cmd+Q' : 'Alt+Shift+Q',
+                click: () => {
+                    mainWindow.close();
                 }
             },
         ]

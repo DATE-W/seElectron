@@ -19,7 +19,8 @@
                 <a-button type="text" style="margin-left: -1vh">
                     <MinusCircleOutlined />缩小
                 </a-button>
-                <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh" @click="codeGenerate">
+                <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh"
+                    @click="() => { codeGenChoosePath = true }">
                     <PlayCircleOutlined />仿真工程代码生成
                 </a-button>
                 <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh" @click="runSimulation">
@@ -28,6 +29,9 @@
                 <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh"
                     @click="() => { simuStarted = true }">
                     <SettingOutlined />仿真运行配置
+                </a-button>
+                <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh" @click="newCanvas">
+                    <SettingOutlined />新建
                 </a-button>
 
                 <!-- <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh"
@@ -209,7 +213,7 @@
         <!-- 终端输出框 -->
         <div class="terminal-container">
             <div class="terminal-header">
-                <a-button type="text" @click="codeGenerate">
+                <a-button type="text" @click="() => { codeGenChoosePath = true }">
                     <PlayCircleOutlined />仿真工程代码生成
                 </a-button>
                 <a-button type="text" @click="runSimulation">
@@ -263,6 +267,8 @@ window.electronAPI.onNewClass(async (value) => {
     addClassDialogVisible.value = true
 })
 
+window.electronAPI.onNewCanvas(newCanvas)
+
 // display
 const selectedItem = ref(null)
 let count = 0;
@@ -272,6 +278,14 @@ const simuStarted = ref(false)
 const terminalOutput = ref('初始化完成')
 function printToTerminal(message) {
     terminalOutput.value += '\n' + message
+}
+
+function newCanvas() {
+    // 别问为什么新建弄得像是清空，需求是这么说的
+    nodes.value = []
+    edges.value = []
+    groups.value = []
+    updateGraph()
 }
 
 function runSimulation() {
@@ -285,14 +299,6 @@ function downloadRunSimulation() {
     window.electronAPI.executeCommand("notepad")
     console.log("仿真工程下载与启动")
     printToTerminal('仿真工程下载与启动')
-}
-
-function codeGenerate() {
-    codeGenChoosePath.value = true;
-    console.log(codeGenChoosePath.value)
-    // const copyCmd = 'xcopy' + fileFolderPath;
-    // window.electronAPI.executeCommand("xcopy D:\\nt\\t1 D:\\nt\\t2 /s /e");
-    // window.electronAPI.openFileExplorer(folderPath);
 }
 
 const processParallelEdgesOnAnchorPoint = (
