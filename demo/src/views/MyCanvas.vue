@@ -8,10 +8,10 @@
         <a-flex justify="space-between" align="flex-start">
             <div>
                 <a-button type="text" @click="loadGraph">
-                    <UploadOutlined />加载
+                    <UploadOutlined />打开
                 </a-button>
                 <a-button type="text" style="margin-left: -1vh" @click="saveGraph">
-                    <DownloadOutlined />下载
+                    <DownloadOutlined />保存
                 </a-button>
                 <a-button type="text" style="margin-left: -1vh">
                     <PlusCircleOutlined />放大
