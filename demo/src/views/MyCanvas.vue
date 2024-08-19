@@ -293,7 +293,13 @@ function downloadRunSimulation() {
 function editSimulation() {
     simuStarted.value = false
     // 删除combos中的resource机器
-    groups.value = groups.value.filter(c => c.nodeClass != 'resource')
+    console.log("group", groups.value)
+    groups.value = groups.value.filter((c) => {
+        if (c.nodeClass === 'group') {
+            c.parentId = null;
+        }
+        return c.nodeClass != 'resource';
+    })
     updateGraph()
 }
 
@@ -828,7 +834,7 @@ function initMenu() {
             return outDiv
         },
         handleMenuClick: (target, item) => {
-            console.log(target, item);
+            console.log("remove", target, item);
             graph.value.removeItem(item);
             edges.value = graph.value.save().edges
             nodes.value = graph.value.save().nodes
@@ -1185,7 +1191,14 @@ function updateGraph() {
 }
 
 function saveGraph() {
-    console.log(graph.value.data)
+    console.log("saveGraph", graph.value)
+    groups.value = groups.value.filter((c) => {
+        if (c.nodeClass === 'group') {
+            c.parentId = null;
+        }
+        return c.nodeClass != 'resource';
+    })
+    updateGraph()
     // 将数据组合成一个对象
     const jsonData = {
         // count:count,
