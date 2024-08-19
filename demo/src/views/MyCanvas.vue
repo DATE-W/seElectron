@@ -33,21 +33,11 @@
                 <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh" @click="newCanvas">
                     <SettingOutlined />新建
                 </a-button>
-
-                <!-- <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh"
-                    @click="loadGraph">
-                    <CloudUploadOutlined />仿真工程加载
-                </a-button>
-                <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh"
-                    @click="saveGraph">
-                    <CloudDownloadOutlined />仿真工程保存
-                </a-button> -->
-
                 <a-button v-show="simuStarted" type="text" style="margin-left: -1vh" @click="downloadRunSimulation">
                     <DownloadOutlined />仿真工程下载与启动
                 </a-button>
                 <a-button v-show="simuStarted" type="text" style="margin-left: -1vh"
-                    @click="() => { simuStarted = false }">
+                    @click="editSimulation">
                     <EditOutlined />仿真工程编辑
                 </a-button>
             </div>
@@ -299,6 +289,12 @@ function downloadRunSimulation() {
     window.electronAPI.executeCommand("notepad")
     console.log("仿真工程下载与启动")
     printToTerminal('仿真工程下载与启动')
+}
+function editSimulation() {
+    simuStarted.value = false
+    // 删除combos中的resource机器
+    groups.value = groups.value.filter(c => c.nodeClass != 'resource')
+    updateGraph()
 }
 
 const processParallelEdgesOnAnchorPoint = (
