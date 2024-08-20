@@ -7,7 +7,10 @@
         <!-- 功能区-->
         <a-flex justify="space-between" align="flex-start">
             <div>
-                <a-button type="text" @click="loadGraph">
+                <a-button v-show="!simuStarted" type="text" @click="newCanvas">
+                    <SettingOutlined />新建
+                </a-button>
+                <a-button type="text" style="margin-left: -1vh" @click="loadGraph">
                     <UploadOutlined />打开
                 </a-button>
                 <a-button type="text" style="margin-left: -1vh" @click="saveGraph">
@@ -30,9 +33,7 @@
                     @click="() => { simuStarted = true }">
                     <SettingOutlined />仿真运行配置
                 </a-button>
-                <a-button v-show="!simuStarted" type="text" style="margin-left: -1vh" @click="newCanvas">
-                    <SettingOutlined />新建
-                </a-button>
+
                 <a-button v-show="simuStarted" type="text" style="margin-left: -1vh" @click="downloadRunSimulation">
                     <DownloadOutlined />仿真工程下载与启动
                 </a-button>
@@ -1325,10 +1326,10 @@ const fileFolderPathRules = reactive({
     ]
 })
 
-async function selectSourceFolder() {
-    fileFolderPath.value.sourcePath = await selectFolder();
-    console.log("sourcePath:" + fileFolderPath.value.sourcePath);
-}
+// async function selectSourceFolder() {
+//     fileFolderPath.value.sourcePath = await selectFolder();
+//     console.log("sourcePath:" + fileFolderPath.value.sourcePath);
+// }
 
 async function selectDestinationFolder() {
     fileFolderPath.value.destinationPath = await selectFolder();
