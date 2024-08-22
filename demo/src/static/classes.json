@@ -47,6 +47,28 @@
             "dependencies": []
         },
         {
+            "class_name": "导引头模型1",
+            "input_num": 1,
+            "input_params": [
+                {
+                    "name": "a",
+                    "type": "[int,double]",
+                    "tag": "a is [int,double]"
+                }
+            ],
+            "code": "导引头模型1",
+            "output_num": 1,
+            "output_params": [
+                {
+                    "name": "b",
+                    "type": "[int,int,string]",
+                    "tag": "b is [int,int,string]"
+                }
+            ],
+            "category": 1,
+            "dependencies": []
+        },
+        {
             "class_name": "控制模型",
             "input_num": 1,
             "output_num": 1,

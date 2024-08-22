@@ -287,7 +287,8 @@ function runSimulation() {
 }
 
 function downloadRunSimulation() {
-    window.electronAPI.executeCommand("notepad")
+    // window.electronAPI.executeCommand("notepad")
+    window.electronAPI.executeCommand(".\\resources\\public\\script.bat C:\\Users\\Administrator\\Desktop\\demo CodeDemo_RTX.rtss 192.168.0.102")
     console.log("仿真工程下载与启动")
     printToTerminal('仿真工程下载与启动')
 }
@@ -455,6 +456,7 @@ const categories = ref([
         categoryName: "模型",
         models: [
             { class_name: "导引头模型", description: "导引头模型", color: "#fff", type: "model" },
+            { class_name: "导引头模型1", description: "导引头模型1", color: "#fff", type: "model" },
             { class_name: "控制模型", description: "控制模型", color: "#fff", type: "model" },
             { class_name: "弹体模型", description: "弹体模型", color: "#fff", type: "model" },
             { class_name: "目标运动模型", description: "目标运动模型", color: "#fff", type: "model" },
@@ -1344,11 +1346,16 @@ const selectFolder = async () => {
 
 const beginGenerate = () => {
     codeGenChoosePath.value = false;
+    const iscode = nodes.value.some(element => element.className === '导引头模型1');
+    if (iscode) {
+        fileFolderPath.value.sourcePath = '.\\resources\\public\\code1';
+    } 
+
     const copyCmd = `xcopy "${fileFolderPath.value.sourcePath}" "${fileFolderPath.value.destinationPath}" /s /e`;
     console.log(copyCmd)
     window.electronAPI.executeCommand(copyCmd);
     window.electronAPI.openFileExplorer(fileFolderPath.value.destinationPath);
-    //fileFolderPath.value.sourcePath = "";
+    fileFolderPath.value.sourcePath = ".\\resources\\public\\code";
     fileFolderPath.value.destinationPath = "";
     printToTerminal('代码生成成功');
 }
